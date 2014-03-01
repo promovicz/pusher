@@ -19,7 +19,6 @@ require "Activity/RootActivity"
 require "Activity/TransportActivity"
 require "Activity/PatternActivity"
 require "Activity/NotesActivity"
-require "Activity/ScalesActivity"
 
 require "Control/Button"
 require "Control/Dial"
