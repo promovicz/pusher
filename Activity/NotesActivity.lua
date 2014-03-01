@@ -6,8 +6,14 @@ class 'NotesActivity' (PusherActivity)
 
 function NotesActivity:__init()
    PusherActivity.__init(self, 'notes')
-   self.mode = 'chromatic'
-   self.octave = -1
+
+   self.mode = 'scale'
+   self.sequential = false
+   self.stride = 3
+   self.scale = SCALES[2]
+   self.key = 1
+   self.orientation = 'horizontal'
+   self.octave = 2
 end
 
 function NotesActivity:register(pusher)
@@ -20,10 +26,7 @@ function NotesActivity:register(pusher)
 
    self.pads = self:handle_control_group('pads')
 
-   self:set_scale(SCALES[1], 1)
-   self:set_octave(2)
-
-   self:update_pitches()
+   self:reconfigure_scale()
 
    self:update()
 end
@@ -34,20 +37,51 @@ function NotesActivity:update()
    local c
    c = self.controls['scales']
    c:set_color('on')
+
+   self:update_octave()
+   self:update_pads()
 end
 
 local max_octave = 8
 
-function NotesActivity:set_octave(octave)
-   if (self.octave ~= octave) then
-      self.octave = octave
-      self:update_octave()
-   end
+function NotesActivity:set_mode(mode)
+   LOG("NotesActivity: set_mode(", mode, ")")
+   self.mode = mode
+   self:reconfigure_pads()
 end
 
-function NotesActivity:set_scale(scale, key)
-   self.scale_pitches = build_scale_pitches(scale, key)
-   self:update_pitches()
+function NotesActivity:set_sequential(sequential)
+   LOG("NotesActivity: set_sequential(", sequential, ")")
+   self.sequential = sequential
+   self:reconfigure_pads()
+end
+
+function NotesActivity:set_stride(stride)
+   LOG("NotesActivity: set_stride(", stride, ")")
+   self.stride = stride
+   self:reconfigure_pads()
+end
+
+function NotesActivity:set_orientation(orientation)
+   LOG("NotesActivity: set_orientation(", orientation, ")")
+   self.orientation = orientation
+   self:reconfigure_pads()
+end
+
+function NotesActivity:set_scale(key, scale)
+   LOG("NotesActivity: set_key(", KEYS_SHARP(key), scale.name, ")")
+   self.scale = scale
+   self.key = key
+   self:reconfigure_scale()
+end
+
+function NotesActivity:set_octave(octave)
+   LOG("NotesActivity: set_octave(", octave, ")")
+   if (octave ~= self.octave) then
+      self.octave = octave
+      self:reconfigure_pads()
+      self:update_octave()
+   end
 end
 
 function NotesActivity:octave_up()
@@ -58,6 +92,39 @@ function NotesActivity:octave_down()
    self:set_octave(math.max(0, self.octave - 1))
 end
 
+
+-- handle button press
+function NotesActivity:on_button_press(control)
+   if (control.id == 'octave-up') then
+      self:octave_up()
+   end
+   if (control.id == 'octave-down') then
+      self:octave_down()
+   end
+end
+
+-- handle pad press
+function NotesActivity:on_pad_press(control, value)
+   local pitch = control.pitch
+   if (pitch ~= nil) then
+      LOG("pitch", pitch.midi)
+      self.pusher.voices:trigger("foo", -1, -1, pitch.midi, value, true, false)
+      control.pitch.playing = true
+      self:update_pads()
+   end
+end
+
+-- handle pad release
+function NotesActivity:on_pad_release(control)
+   local pitch = control.pitch
+   if (pitch ~= nil) then
+      self.pusher.voices:release("foo", -1, -1, pitch.midi, 0, false)
+      control.pitch.playing = false
+      self:update_pads()
+   end
+end
+
+-- update octave buttons
 function NotesActivity:update_octave()
    local up = self.controls['octave-up']
    local dn = self.controls['octave-down']
@@ -71,87 +138,92 @@ function NotesActivity:update_octave()
    else
       up:set_color('on')
    end
-   self:update_pitches()
 end
 
-function NotesActivity:update_pitches()
-   local sp = self.scale_pitches
-   for _, pad in pairs(self.pads) do
-      local pitch = self:get_pitch(pad)
-      local psp = sp[pitch + 1]
-      pad.pitch = psp
-      if (psp == nil) then
-         pad:set_color('off')
-      else
-         self:update_pad(pad)
-      end
-   end
-end
-
+-- update all pads
 function NotesActivity:update_pads()
    for _, pad in pairs(self.pads) do
-      self:update_pad(pad)
-   end
-end
-
-function NotesActivity:update_pad(pad)
-   if (pad.pitch == nil) then
-      pad:set_color('off')
-   elseif (pad.pitch.playing) then
-      pad:set_color('green')
-   else
-      local pr = pad.pitch.scale_relationship
-      if (pr == 'tonic') then
-         pad:set_color('sky')
-      elseif (pr == 'member') then
-         pad:set_color('white')
+      if (pad.pitch == nil) then
+         pad:set_color('red')
+      elseif (pad.pitch.playing) then
+         pad:set_color('green')
       else
-         pad:set_color('off')
+         local pr = pad.pitch.scale_relationship
+         if (pr == 'tonic') then
+            pad:set_color('sky')
+         elseif (pr == 'member') then
+            pad:set_color('white')
+         else
+            pad:set_color('off')
+         end
       end
    end
 end
 
-function NotesActivity:get_voice(control)
-   return self.id .. "-" .. control.id
+-- reconfigure for changed scale
+function NotesActivity:reconfigure_scale()
+   self.pitches = build_scale_pitches(self.scale, self.key)
+   self:reconfigure_pads()
 end
 
-function NotesActivity:get_pitch(control)
-   if (self.mode == 'chromatic') then
-      return self.octave * 12 + (control.y - 1) * 8 + (control.x - 1)
-   end
-   if (self.mode == 'hands') then
-      local octave = self.octave
-      local pitch = control.x - 1
-      if (control.x > 4) then
-         octave = octave + 2
-         pitch = pitch - 4
+-- reconfigure pads for changed pitch/octave/scale/whatever
+function NotesActivity:reconfigure_pads()
+   for _, pad in pairs(self.pads) do
+      -- pad offsets for arithmetics
+      local x = pad.x - 1
+      local y = pad.y - 1
+
+      -- compute stride
+      local stride
+      if (self.sequential) then
+         -- XXX should be width or height of pad array depending on orientation.
+         --     this does not matter for the push but might for other controllers.
+         stride = 8
+      else
+         stride = self.stride
       end
-      pitch = pitch + self.octave * 12 + (control.y - 1) * 4
-      return pitch
+
+      -- compute axis strides according to orientation
+      local sx
+      local sy
+      if (self.orientation == 'horizontal') then
+         sx = 1
+         sy = stride
+      else
+         sx = stride
+         sy = 1
+      end
+
+      -- offsets
+      local ox = 0
+      local oy = 0
+
+      -- index of pad in 
+      local index = sx * (ox + x) + sy * (oy + y)
+
+      -- compute the pitch for the pad
+      local offset = -1
+      if (self.mode == 'chromatic') then
+         -- XXX the key should affect this, not?
+         local o = math.floor(index / 12)
+         local n = index % 12
+         offset = (self.octave + o) * 12 + n
+      elseif (self.mode == 'scale') then
+         local size = self.scale.length
+         local o = math.floor(index / size)
+         local no = index % size
+         local n = self.scale.pitches[no + 1]
+         offset = (self.octave + o) * 12 + n + (self.key - 1)
+      end
+
+      -- apply result to the pad
+      if (offset >= 0 and offset < #self.pitches) then
+         pad.pitch = self.pitches[offset + 1]
+      else
+         pad.pitch = nil
+      end
    end
 
-end
-
-function NotesActivity:on_button_press(control)
-   if (control.id == 'octave-up') then
-      self:octave_up()
-   end
-   if (control.id == 'octave-down') then
-      self:octave_down()
-   end
-end
-
-function NotesActivity:on_pad_press(control, value)
-   local pitch = control.pitch
-   LOG("pitch", pitch.midi)
-   self.pusher.voices:trigger(self:get_voice(control), -1, -1, pitch.midi, value, true, false)
-   control.pitch.playing = true
-   self:update_pads()
-end
-
-function NotesActivity:on_pad_release(control)
-   local pitch = control.pitch
-   self.pusher.voices:release(self:get_voice(control), -1, -1, pitch.midi, 0, false)
-   control.pitch.playing = false
+   -- redraw all pads
    self:update_pads()
 end

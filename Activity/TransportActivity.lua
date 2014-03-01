@@ -18,7 +18,6 @@ function TransportActivity:register(pusher)
    local transport = renoise.song().transport
 
    local update = function()
-      LOG("updating transport")
       self:update()
    end
 
@@ -44,12 +43,12 @@ function TransportActivity:update()
    if (transport.edit_mode) then
       record:set_color('full')
    else
-      record:set_color('off')
+      record:set_color('half')
    end
    if (transport.playing) then
       play:set_color('full')
    else
-      play:set_color('off')
+      play:set_color('half')
    end
 end
 

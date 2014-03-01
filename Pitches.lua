@@ -12,7 +12,7 @@ KEYS_FLAT = {
 }
 
 -- combines the above tables to "sharp/flat" notation
-function build_keys_both()
+function build_keys_combined()
    local result = { }
    for i, sharp in pairs(KEYS_SHARP) do
       local flat = KEYS_FLAT[i]
@@ -26,39 +26,7 @@ function build_keys_both()
 end
 
 -- names of all keys in "sharp/flat" notation
-KEYS_BOTH = build_keys_both()
-
--- scale definitions
-SCALES = {
-   {
-      name = "Major",
-      pitches = { 1,3,5,6,8,10,12 }
-   },
-   {
-      name = "Pentatonic Major",
-      pitches = { 1,3,5,8,10 }
-   },
-   {
-      name = "Blues Major",
-      pitches = { 1,4,6,7,8,10 }
-   },
-   {
-      name = "Minor",
-      pitches = { 1,3,4,6,8,9,11 }
-   },
-   {
-      name = "Melodic Minor",
-      pitches = { 1,3,4,6,8,10,12 }
-   },
-   {
-      name = "Harmonic Minor",
-      pitches = { 1,3,4,6,8,9,12 }
-   },
-   {
-      name = "Pentatonic Minor",
-      pitches = { 1,4,6,8,11 }
-   }
-}
+KEYS_COMBINED = build_keys_combined()
 
 -- builds a table of all midi pitches
 function build_pitches()
@@ -76,7 +44,36 @@ function build_pitches()
    return pitches
 end
 
+-- table of all midi pitches
 PITCHES = build_pitches()
+
+-- scale definitions
+SCALE_DEFINITIONS = {
+   {
+      name = "Major",
+      pitches = { 0,2,4,5,7,9,11 }
+   },
+   {
+      name = "Pentatonic Major",
+      pitches = { 0,2,4,7,9 }
+   },
+}
+
+function build_scale(definition)
+   definition.length = #definition.pitches
+   definition.diatonic = definition.length == 8 and definition.pitches[8] == 12
+   return definition
+end
+
+function build_scales()
+   local scales = { }
+   for _, definition in pairs(SCALE_DEFINITIONS) do
+      scales[_] = build_scale(definition)
+   end
+   return scales
+end
+
+SCALES = build_scales()
 
 function build_scale_pitches(scale, key)
    LOG("building scale pitches for", KEYS_SHARP[key], scale.name)
@@ -91,15 +88,19 @@ function build_scale_pitches(scale, key)
       -- compute offset from tonic
       local pitch_offset = (pitch_index - key_offset) % 12
 
+      LOG("pitch", pitch_index, "offset", pitch_offset)
+
       -- determine scale relationship
       local relationship = 'none'
       if (pitch_offset == 0) then
+         LOG("tonic")
          -- this pitch is the tonic and in the scale
          relationship = 'tonic'
       else
          -- check if this pitch is in the scale
          for _, p in pairs(scale.pitches) do
-            if (p - 1 == pitch_offset) then
+            if (p < 12 and p == pitch_offset) then
+               LOG("member")
                relationship = 'member'
             end
          end

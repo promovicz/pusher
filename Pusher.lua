@@ -69,6 +69,8 @@ function Pusher:add_control(control)
       control.group = 'none'
    end
 
+   LOG("control", control.id, "in group", control.group)
+
    self.controls[control.id] = control
    control:register(self)
 end
@@ -100,6 +102,22 @@ function Pusher:get_control_handler(id)
    return nil
 end
 
+function Pusher:get_pad_bottom(x, y)
+   if (x >= 1 and x <= 8 and y >= 1 and y <= 8) then
+      return self.pads[y][x]
+   else
+      return nil
+   end
+end
+
+function Pusher:get_pad_top(x, y)
+   if (x >= 1 and x <= 8 and y >= 1 and y <= 8) then
+      return self.pads[8 - (y - 1)][x]
+   else
+      return nil
+   end
+end
+
 -- get the pad control for the given coordinates
 function Pusher:get_pad(x, y)
    return self.controls['pad-' .. x .. '-' .. y]
@@ -125,11 +143,13 @@ function Pusher:initialize_controls()
         p = 'simple'
      end
      local c = PusherButton(b.id, b.cc, PALETTES[p])
+     c.group = b.group
      self:add_control(c)
   end
   -- dials
   for _, def in pairs(DIALS) do
      local dial = PusherDial(def.id, def.cc, def.note)
+     dial.group = def.group
      self:add_control(dial)
   end
   -- display
@@ -139,18 +159,24 @@ function Pusher:initialize_controls()
                       index,
                       DISPLAY_CLEAR[index],
                       DISPLAY_WRITE[index])
+     display.group = "display"
      self:add_control(display)
   end
   -- pads
+  local pads = { }
   for y in range(0, 7) do
+     local padline = { }
+     local palette = PALETTES['rgb']
      for x in range(0, 7) do
-        local pal = 'rgb'
         local id = ("pad-%d-%d"):format(x + 1, y + 1)
-        local p = PusherPad(id, x + 1, y + 1, 36 + x + (y * 8), PALETTES[pal])
+        local p = PusherPad(id, x + 1, y + 1, 36 + x + (y * 8), palette)
         p.group = 'pads'
         self:add_control(p)
+        padline[x + 1] = p
      end
+     pads[y + 1] = padline
   end
+  self.pads = pads
 end
 
 -- initialize all activities
@@ -161,10 +187,10 @@ function Pusher:initialize_activities()
    root:register(self)
    local transport = TransportActivity()
    transport:register(self)
-   local notes = NotesActivity()
-   notes:register(self)
+   local m = NotesActivity()
+   m:register(self)
    -- set up a static activity stack
-   self.activity_stack = {notes, transport, root}
+   self.activity_stack = {m, transport, root}
 end
 
 -- initialize the controller
@@ -187,7 +213,7 @@ function Pusher:midi_callback(message)
      note = message[2]
      value = message[3]
      handler = self.handlers_note[note]
-     if(message[1]>143)then
+     if (message[1]>143)then
         -- note on
         channel = message[1]-143
         if (self.dump_midi) then
