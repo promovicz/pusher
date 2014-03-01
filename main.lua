@@ -13,6 +13,7 @@ require "OscVoiceMgr"
 require "Pusher"
 require "PusherActivity"
 require "PusherControl"
+require "PusherMidi"
 
 require "Activity/RootActivity"
 require "Activity/TransportActivity"
