@@ -102,6 +102,7 @@ function Pusher:get_control_handler(id)
    return nil
 end
 
+-- get pad counting from bottom left
 function Pusher:get_pad_bottom(x, y)
    if (x >= 1 and x <= 8 and y >= 1 and y <= 8) then
       return self.pads[y][x]
@@ -110,6 +111,7 @@ function Pusher:get_pad_bottom(x, y)
    end
 end
 
+-- get pad counting from top left
 function Pusher:get_pad_top(x, y)
    if (x >= 1 and x <= 8 and y >= 1 and y <= 8) then
       return self.pads[8 - (y - 1)][x]
