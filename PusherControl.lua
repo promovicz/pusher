@@ -30,14 +30,12 @@ function PusherControl:update()
    self.invalid = false
 end
 
+-- default event handlers
 function PusherControl:on_cc(control,value)
 end
-
 function PusherControl:on_note_on(note,value)
 end
-
 function PusherControl:on_note_off(note,value)
 end
-
 function PusherControl:on_note_aftertouch(note,value)
 end

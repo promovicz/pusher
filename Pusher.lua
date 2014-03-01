@@ -6,14 +6,19 @@ function Pusher:__init(port_in, port_out)
    self.midi = PusherMidi(port_in, port_out)
    -- all controls
    self.controls = {}
-   -- stack of activities
-   self.activity_stack = {}
    -- OSC client for note triggering
    self.osc_client = OscClient("127.0.0.1", 8000)
    self.voices = OscVoiceMgr(self.osc_client)
+   -- activity variables
+   self.activities = { }
+   self.mode_activity = nil
+   self.dialog_activity = nil
+   -- display magic
+   self.display_updates = 0
    -- create controls and activities
    self:initialize_controls()
    self:initialize_activities()
+   self:update()
    -- open MIDI links
    self:open()
 end
@@ -33,20 +38,77 @@ function Pusher:release()
 end
 
 function Pusher:mode_note()
-   self.activities = {self.a_notes, self.a_transport, self.a_root}
-   self:update()
+   self:set_mode(self.a_notes)
 end
 function Pusher:mode_pattern()
-   self.activities = {self.a_pattern, self.a_transport, self.a_root}
-   self:update()
+   self:set_mode(self.a_pattern)
+end
+function Pusher:set_mode(activity)
+   LOG("Pusher: set_mode(" .. activity.id .. ")")
+   if (self.mode_activity == nil
+       or self.mode_activity.id ~= activity.id) then
+      self.mode_activity = activity
+      self:kill_dialog()
+      self:update()
+   end
+end
+
+function Pusher:in_dialog(id)
+   return self.dialog_activity ~= nil
+      and self.dialog_activity.id == id
+end
+function Pusher:show_device_dialog()
+   self:show_dialog(self.d_device)
+end
+function Pusher:show_track_dialog()
+   self:show_dialog(self.d_track)
+end
+function Pusher:show_scale_dialog()
+   self:show_dialog(self.d_scale)
+end
+function Pusher:show_volume_dialog()
+   self:show_dialog(self.d_volume)
+end
+function Pusher:show_dialog(dialog)
+   LOG("Pusher: show_dialog(" .. dialog.id .. ")")
+   if (self.dialog_activity == nil
+       or self.dialog_activity.id ~= dialog.id) then
+      self.dialog_activity = dialog
+      self:update()
+   end
+end
+function Pusher:hide_dialog(dialog)
+   LOG("Pusher: hide_dialog(" .. dialog.id .. ")")
+   if (self.dialog_activity == dialog) then
+      self.dialog_activity = nil
+      self:update()
+   end
+end
+function Pusher:kill_dialog()
+   LOG("Pusher: kill_dialog()")
+   if (self.dialog_activity ~= nil) then
+      self.dialog_activity = nil
+   end
+end
+
+function Pusher:show_overlay(overlay)
+   LOG("Pusher: show_overlay(" .. overlay.id .. ")")
+end
+function Pusher:hide_overlay(overlay)
+   LOG("Pusher: hide_overlay(" .. overlay.id .. ")")
+end
+function Pusher:kill_overlay()
+   LOG("Pusher: kill_overlay()")
 end
 
 -- get the topmost handler for the control with the given id
 function Pusher:get_control_handler(id)
    for _, activity in pairs(self.activities) do
-      local control = activity.controls[id]
-      if (control ~= nil) then
-         return activity
+      if (activity ~= nil) then
+         local control = activity.controls[id]
+         if (control ~= nil) then
+            return activity
+         end
       end
    end
    return nil
@@ -75,7 +137,7 @@ function Pusher:add_control(control)
       control.group = 'none'
    end
 
-   LOG("control", control.id, "in group", control.group)
+   --LOG("control", control.id, "in group", control.group)
 
    self.controls[control.id] = control
    control:register(self)
@@ -131,24 +193,32 @@ function Pusher:initialize_controls()
      end
      local c = PusherButton(b.id, b.cc, PALETTES[p])
      c.group = b.group
+     c.x = b.x
+     c.y = b.y
      self:add_control(c)
   end
   -- dials
   for _, def in pairs(DIALS) do
      local dial = PusherDial(def.id, def.cc, def.note)
      dial.group = def.group
+     dial.x = def.x
+     dial.y = def.y
      self:add_control(dial)
   end
   -- display
+  local displays = { }
   for index in range(1, 4) do
-     local display =
-        PusherDisplay("display-" .. index,
-                      index,
-                      DISPLAY_CLEAR[index],
-                      DISPLAY_WRITE[index])
-     display.group = "display"
-     self:add_control(display)
+     local display = PusherDisplay(index,
+                                   DISPLAY_CLEAR[index],
+                                   DISPLAY_WRITE[index])
+     displays[index] = display
+     display:register(self)
   end
+  local tick = function()
+     self:update_displays()
+  end
+  renoise.tool():add_timer(tick, 50)
+  self.displays = displays
   -- pads
   local pads = { }
   for y in range(0, 7) do
@@ -170,18 +240,22 @@ end
 function Pusher:initialize_activities()
    LOG("Pusher: initialize_activities()")
    -- create activities
-   self.a_root = RootActivity()
-   self.a_root:register(self)
-   self.a_transport = TransportActivity()
-   self.a_transport:register(self)
-   self.a_notes = NotesActivity()
-   self.a_notes:register(self)
-   self.a_pattern = PatternActivity()
-   self.a_pattern:register(self)
+   self.a_root = self:initialize_activity(RootActivity)
+   self.a_transport = self:initialize_activity(TransportActivity)
+   self.a_notes = self:initialize_activity(NotesActivity)
+   self.a_pattern = self:initialize_activity(PatternActivity)
 
-   -- set up a static activity stack
-   self.activities = {self.a_notes, self.a_transport, self.a_root}
-   self:update()
+   self.d_device = self:initialize_activity(DeviceDialog)
+   self.d_scale = self:initialize_activity(ScaleDialog)
+   self.d_track = self:initialize_activity(TrackDialog)
+   self.d_volume = self:initialize_activity(VolumeDialog)
+
+   self.mode_activity = self.a_notes
+end
+function Pusher:initialize_activity(class)
+   local instance = class()
+   instance:register(self)
+   return instance
 end
 
 -- initialize the controller
@@ -198,9 +272,36 @@ end
 
 -- update all controls
 function Pusher:update()
-   local activities = self.activities
+   LOG("Pusher:update()")
+
+   local activities = table.create()
+   if (self.dialog_activity ~= nil) then
+      activities[#activities+1] = self.dialog_activity
+   end
+   if (self.mode_activity ~= nil) then
+      activities[#activities+1] = self.mode_activity
+   end
+   activities[#activities+1] = self.a_transport
+   activities[#activities+1] = self.a_root
+
+   self.activities = activities
+
    for i = #activities,1,-1 do
       local a = activities[i]
-      a:update()
+      if (a ~= nil) then
+         a:update()
+      end
+   end
+end
+
+-- update displays
+function Pusher:update_displays()
+   self.display_updates = self.display_updates + 1
+   local invalidate = (self.display_updates % 10 == 0)
+   for i, d in pairs(self.displays) do
+      if (invalidate) then
+         d:invalidate()
+      end
+      d:update()
    end
 end

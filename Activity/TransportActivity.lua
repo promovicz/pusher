@@ -6,9 +6,16 @@ function TransportActivity:__init()
 end
 
 function TransportActivity:register(pusher)
+   LOG("TransportActivity: register()")
    PusherActivity.register(self, pusher)
 
    self:handle_control('master')
+
+   self:handle_control('volume')
+   self:handle_control('pan-send')
+   self:handle_control('track')
+   self:handle_control('device')
+
    self:handle_control('note')
    self:handle_control('session')
 
@@ -20,30 +27,50 @@ function TransportActivity:register(pusher)
    self:handle_control('tap-tempo')
 
    local transport = renoise.song().transport
-
-   local update = function()
-      self:update()
-   end
-
-   transport.metronome_enabled_observable:add_notifier(update)
-   transport.edit_mode_observable:add_notifier(update)
-   transport.playing_observable:add_notifier(update)
-
-   update()
+   transport.metronome_enabled_observable:add_notifier(self, TransportActivity.update)
+   transport.edit_mode_observable:add_notifier(self, TransportActivity.update)
+   transport.playing_observable:add_notifier(self, TransportActivity.update)
 end
 
 function TransportActivity:update()
    LOG("TransportActivity: update()")
    local transport = renoise.song().transport
 
-   self.controls['master']:set_color('full')
+   local c
 
-   self.controls['note']:set_color('full')
-   self.controls['session']:set_color('full')
+   self:get_control('note'):set_color('full')
+   self:get_control('session'):set_color('full')
 
-   local metronome = self.controls['metronome']
-   local record = self.controls['record']
-   local play = self.controls['play']
+   self:get_control('master'):set_color('full')
+
+   c = self:get_control('volume')
+   if (self.pusher:in_dialog('volume')) then
+      c:set_color('full')
+   else
+      c:set_color('half')
+   end
+   c = self:get_control('pan-send')
+   if (self.pusher:in_dialog('pan-send')) then
+      c:set_color('full')
+   else
+      c:set_color('half')
+   end
+   c = self:get_control('track')
+   if (self.pusher:in_dialog('track')) then
+      c:set_color('full')
+   else
+      c:set_color('half')
+   end
+   c = self:get_control('device')
+   if (self.pusher:in_dialog('device')) then
+      c:set_color('full')
+   else
+      c:set_color('half')
+   end
+
+   local metronome = self:get_control('metronome')
+   local record = self:get_control('record')
+   local play = self:get_control('play')
 
    if (transport.metronome_enabled) then
       metronome:set_color('full')
@@ -83,7 +110,17 @@ function TransportActivity:on_button_press(control)
       end
    end
    if(id == 'tap-tempo') then
-      
+   end
+   if(id == 'volume') then
+      self.pusher:show_volume_dialog()
+   end
+   if(id == 'pan-send') then
+   end
+   if(id == 'track') then
+      self.pusher:show_track_dialog()
+   end
+   if(id == 'device') then
+      self.pusher:show_device_dialog()
    end
    if(id == 'note') then
       self.pusher:mode_note()

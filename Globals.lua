@@ -53,6 +53,12 @@ SPACES = {
 }
 
 function format_for_display(text, max, justify)
+   if (text == nil) then
+      text = ""
+   end
+   if (justify == nil) then
+      justify = 0
+   end
    if (#text == max) then
       return text
    elseif (#text > max) then

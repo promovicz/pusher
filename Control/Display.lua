@@ -1,8 +1,7 @@
 
-class 'PusherDisplay' (PusherControl)
+class 'PusherDisplay'
 
-function PusherDisplay:__init(id, index, clear_op, write_op)
-   PusherControl.__init(self, 'display', id)
+function PusherDisplay:__init(index, clear_op, write_op)
    self.index = index
    self.clear_op = clear_op
    self.write_op = write_op
@@ -11,12 +10,25 @@ function PusherDisplay:__init(id, index, clear_op, write_op)
 end
 
 function PusherDisplay:register(pusher)
-   PusherControl.register(self, pusher)
-   if (self.index < 3) then
-      self:set_text_8({"abcdefghij", "cdefghijkl", "ef", "gh", "ij", "kl", "mn", "op"})
-   else
-      self:set_text_4({"abcd", "efgh", "ijkl", "mnop"})
+   self.pusher = pusher
+   local cells = { }
+   for i in range(1,4) do
+      local cell = PusherDisplayCell(self, i, "display-" .. i .. "-" .. self.index)
+      cell.group = "display"
+      cells[i] = cell
+      pusher:add_control(cell)
    end
+   self.cells = cells
+end
+
+function PusherDisplay:pull()
+   local parts = { }
+   local justs = { }
+   for i, c in pairs(self.cells) do
+      parts[i] = c.text
+      justs[i] = c.justify
+   end
+   self.line = self:format_line_4(parts, justs)
 end
 
 function PusherDisplay:update()
@@ -31,46 +43,37 @@ function PusherDisplay:update()
    end
 end
 
-function PusherDisplay:set_text(line)
-   self.line = line
-   self:update()
+function PusherDisplay:invalidate()
+   self.invalid = true
 end
 
 function PusherDisplay:format_parts(parts, num, each, justify)
-   if (justify == nil) then
-      justify = 0
-   end
    local chunks = {}
    for i in range(1, num) do
       local part = parts[i]
-      if (part == nil) then
-         part = ""
+      local just = nil
+      if (justify ~= nil) then
+         just = justify[i]
       end
-      chunks[i] = format_for_display(part, each, justify)
+      chunks[i] = format_for_display(part, each, just)
    end
    return chunks
 end
 
-function PusherDisplay:set_text_4(parts, justify)
+function PusherDisplay:format_line_4(parts, justify)
    local chunks = self:format_parts(parts, 4, 17, justify)
-   self:set_text(
+   return
       chunks[1] .. chunks[2] ..
       chunks[3] .. chunks[4]
-   )
 end
 
-function PusherDisplay:set_text_8(parts, justify)
+function PusherDisplay:format_line_8(parts, justify)
    local chunks = self:format_parts(parts, 8, 8, justify)
-   self:set_text(
+   return
       chunks[1] .. " " .. chunks[2] ..
       chunks[3] .. " " .. chunks[4] ..
       chunks[5] .. " " .. chunks[6] ..
       chunks[7] .. " " .. chunks[8]
-   )
-end
-
-function PusherDisplay:clear_text()
-   self:set_text(nil)
 end
 
 function PusherDisplay:do_clear()
@@ -81,4 +84,45 @@ end
 function PusherDisplay:do_write()
    self.pusher:send_sysex(
       SYSEX_START, self.write_op, self.line, DISPLAY_WRITE_END)
+end
+
+
+class 'PusherDisplayCell' (PusherControl)
+
+function PusherDisplayCell:__init(display, index, id)
+   PusherControl.__init(self, "display", id)
+   self.display = display
+   self.index = index
+   self.text = ""
+   self.justify = 0
+end
+
+function PusherDisplayCell:update()
+   PusherControl:update(self)
+   self.display:pull()
+end
+
+function PusherDisplayCell:clear()
+   self:set_text()
+end
+
+function PusherDisplayCell:set_text(text, justify)
+   if (text == nil) then
+      text = ""
+   end
+   if (justify == nil) then
+      justify = 0
+   end
+   self.text = text
+   self.justify = justify
+   self:update()
+end
+
+function PusherDisplayCell:set_split(ltext, rtext, ljust, rjust, separator)
+   if (separator == nil) then
+      separator = " "
+   end
+   local l = format_for_display(ltext, 8, ljust)
+   local r = format_for_display(rtext, 8, rjust)
+   self:set_text(l .. separator .. r, 0)
 end

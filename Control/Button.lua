@@ -26,6 +26,9 @@ function PusherButton:update()
 end
 
 function PusherButton:set_color(color)
+   if (color == nil) then
+      color = 'off'
+   end
    self.color = color
    self:update()
 end

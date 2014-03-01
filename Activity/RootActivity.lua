@@ -27,7 +27,7 @@ function RootActivity:update()
          control:set_color('off')
       end
       if (control.type == 'display') then
-         control:set_text(nil)
+         control:set_text(" ")
       end
    end
 end

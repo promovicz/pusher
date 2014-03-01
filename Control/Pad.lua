@@ -27,6 +27,9 @@ function PusherPad:update()
 end
 
 function PusherPad:set_color(color)
+   if (color == nil) then
+      color = 'off'
+   end
    self.color = color
    self:update()
 end

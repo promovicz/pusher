@@ -12,6 +12,7 @@ function PatternActivity:__init()
 end
 
 function PatternActivity:register(pusher)
+   LOG("PatternActivity: register()")
    PusherActivity.register(self, pusher)
 
    -- pads for sequencer display
@@ -20,17 +21,9 @@ function PatternActivity:register(pusher)
    self:handle_control_group('cursor')
 
    local sequencer = renoise.song().sequencer
-
-   local update = function()
-      LOG("updating pattern")
-      self:update()
-   end
-
-   sequencer.pattern_assignments_observable:add_notifier(update)
-   sequencer.pattern_sequence_observable:add_notifier(update)
-   sequencer.selection_range_observable:add_notifier(update)
-
-   update()
+   sequencer.pattern_assignments_observable:add_notifier(self, PatternActivity.update)
+   sequencer.pattern_sequence_observable:add_notifier(self, PatternActivity.update)
+   sequencer.selection_range_observable:add_notifier(self, PatternActivity.update)
 end
 
 function PatternActivity:update()

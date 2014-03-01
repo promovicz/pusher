@@ -49,12 +49,56 @@ PITCHES = build_pitches()
 
 -- scale definitions
 SCALE_DEFINITIONS = {
-   {
+   { -- 1
       name = "Major",
       pitches = { 0,2,4,5,7,9,11 }
    },
-   {
-      name = "Pentatonic Major",
+   { -- 2
+      name = "Minor",
+      pitches = { 0,2,3,5,7,8,10 }
+   },
+   { -- 3
+      name = "Dorian",
+      pitches = { 0,2,3,5,7,9,10 }
+   },
+   { -- 4
+      name = "Mixolydian",
+      pitches = { 0,2,4,5,7,9,10 }
+   },
+   { -- 5
+      name = "Lydian",
+      pitches = { 0,2,4,6,7,9,10 }
+   },
+   { -- 6
+      name = "Phrygian",
+      pitches = { 0,1,3,5,7,8,10 }
+   },
+   { -- 7
+      name = "Locrian",
+      pitches = { 0,1,3,4,7,8,10 }
+   },
+   { -- 8
+      name = "Diminished",
+      pitches = { 0,1,3,4,6,7,9,10 }
+   },
+   { -- 9
+      name = "Whole-half",
+      pitches = { 0,2,3,5,6,7,9,10 }
+   },
+   { -- 10
+      name = "Whole Tone",
+      pitches = { 0,2,4,6,8,10 }
+   },
+   { -- 11
+      name = "Minor Blues",
+      pitches = { 0,3,5,6,7,10 }
+   },
+   { -- 12
+      name = "Minor Pentatonic",
+      pitches = { 0,3,5,7,10 }
+   },
+   { -- 13
+      name = "Major Pentatonic",
       pitches = { 0,2,4,7,9 }
    },
 }
@@ -74,9 +118,11 @@ function build_scales()
 end
 
 SCALES = build_scales()
+SCALE_MIN = 1
+SCALE_MAX = #SCALES
 
 function build_scale_pitches(scale, key)
-   LOG("building scale pitches for", KEYS_SHARP[key], scale.name)
+   -- LOG("building scale ", KEYS_SHARP[key], scale.name)
 
    local scalepitches = { }
 

@@ -7,13 +7,14 @@ class 'NotesActivity' (PusherActivity)
 function NotesActivity:__init()
    PusherActivity.__init(self, 'notes')
 
-   self.mode = 'scale'
+   self.fixed = false
+   self.chromatic = false
    self.sequential = false
    self.stride = 3
-   self.scale = SCALES[2]
+   self.scale = 1
    self.key = 1
    self.orientation = 'horizontal'
-   self.octave = 2
+   self.octave = 3
 end
 
 function NotesActivity:register(pusher)
@@ -28,8 +29,6 @@ function NotesActivity:register(pusher)
    self:handle_control('octave-down')
 
    self:reconfigure_scale()
-
-   self:update()
 end
 
 function NotesActivity:update()
@@ -45,18 +44,21 @@ function NotesActivity:update()
    self:update_pads()
 end
 
-local min_octave = 0
-local max_octave = 8
-
-function NotesActivity:set_mode(mode)
-   LOG("NotesActivity: set_mode(", mode, ")")
-   self.mode = mode
+function NotesActivity:set_chromatic(chromatic)
+   LOG("NotesActivity: set_chromatic(", chromatic, ")")
+   self.chromatic = chromatic
    self:reconfigure_pads()
 end
 
 function NotesActivity:set_sequential(sequential)
    LOG("NotesActivity: set_sequential(", sequential, ")")
    self.sequential = sequential
+   self:reconfigure_pads()
+end
+
+function NotesActivity:set_fixed(fixed)
+   LOG("NotesActivity: set_fixed(", fixed, ")")
+   self.fixed = fixed
    self:reconfigure_pads()
 end
 
@@ -72,12 +74,20 @@ function NotesActivity:set_orientation(orientation)
    self:reconfigure_pads()
 end
 
-function NotesActivity:set_scale(key, scale)
-   LOG("NotesActivity: set_key(", KEYS_SHARP(key), scale.name, ")")
+function NotesActivity:set_scale(scale)
+   LOG("NotesActivity: set_scale(", scale, ")")
    self.scale = scale
+   self:reconfigure_scale()
+end
+
+function NotesActivity:set_key(key)
+   LOG("NotesActivity: set_key(", KEYS_SHARP[key], ")")
    self.key = key
    self:reconfigure_scale()
 end
+
+local min_octave = 0
+local max_octave = 7
 
 function NotesActivity:set_octave(octave)
    LOG("NotesActivity: set_octave(", octave, ")")
@@ -99,11 +109,15 @@ end
 
 -- handle button press
 function NotesActivity:on_button_press(control)
-   if (control.id == 'octave-up') then
+   local id = control.id
+   if (id == 'octave-up') then
       self:octave_up()
    end
-   if (control.id == 'octave-down') then
+   if (id == 'octave-down') then
       self:octave_down()
+   end
+   if (id == 'scales') then
+      self.pusher:show_scale_dialog()
    end
 end
 
@@ -166,12 +180,13 @@ end
 
 -- reconfigure for changed scale
 function NotesActivity:reconfigure_scale()
-   self.pitches = build_scale_pitches(self.scale, self.key)
+   self.pitches = build_scale_pitches(SCALES[self.scale], self.key)
    self:reconfigure_pads()
 end
 
 -- reconfigure pads for changed pitch/octave/scale/whatever
 function NotesActivity:reconfigure_pads()
+   local scale = SCALES[self.scale]
    for _, pad in pairs(self.pads) do
       -- pad offsets for arithmetics
       local x = pad.x - 1
@@ -184,7 +199,11 @@ function NotesActivity:reconfigure_pads()
          --     this does not matter for the push but might for other controllers.
          stride = 8
       else
-         stride = self.stride
+         if (self.chromatic) then
+            stride = 5
+         else
+            stride = 3
+         end
       end
 
       -- compute axis strides according to orientation
@@ -207,16 +226,18 @@ function NotesActivity:reconfigure_pads()
 
       -- compute the pitch for the pad
       local offset = -1
-      if (self.mode == 'chromatic') then
-         -- XXX the key should affect this, not?
+      if (self.chromatic) then
          local o = math.floor(index / 12)
          local n = index % 12
          offset = (self.octave + o) * 12 + n
-      elseif (self.mode == 'scale') then
-         local size = self.scale.length
+         if (not self.fixed) then
+            offset = offset + (self.key - 1)
+         end
+      else
+         local size = scale.length
          local o = math.floor(index / size)
          local no = index % size
-         local n = self.scale.pitches[no + 1]
+         local n = scale.pitches[no + 1]
          offset = (self.octave + o) * 12 + n + (self.key - 1)
       end
 

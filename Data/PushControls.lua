@@ -6,14 +6,14 @@ DIALS = {
    { id = 'swing-knob', cc = 15, note = 9 },
 
    -- above display
-   { id = 'knob-1', cc = 71, note = 0, group = 'knobs' },
-   { id = 'knob-2', cc = 72, note = 1, group = 'knobs' },
-   { id = 'knob-3', cc = 73, note = 2, group = 'knobs' },
-   { id = 'knob-4', cc = 74, note = 3, group = 'knobs' },
-   { id = 'knob-5', cc = 75, note = 4, group = 'knobs' },
-   { id = 'knob-6', cc = 76, note = 5, group = 'knobs' },
-   { id = 'knob-7', cc = 77, note = 6, group = 'knobs' },
-   { id = 'knob-8', cc = 78, note = 7, group = 'knobs' },
+   { id = 'knob-1', cc = 71, note = 0, group = 'knobs', x = 1 },
+   { id = 'knob-2', cc = 72, note = 1, group = 'knobs', x = 2 },
+   { id = 'knob-3', cc = 73, note = 2, group = 'knobs', x = 3 },
+   { id = 'knob-4', cc = 74, note = 3, group = 'knobs', x = 4 },
+   { id = 'knob-5', cc = 75, note = 4, group = 'knobs', x = 5 },
+   { id = 'knob-6', cc = 76, note = 5, group = 'knobs', x = 6 },
+   { id = 'knob-7', cc = 77, note = 6, group = 'knobs', x = 7 },
+   { id = 'knob-8', cc = 78, note = 7, group = 'knobs', x = 8 },
 
    -- master
    { id = 'master-knob', cc = 79, note = 8 },
@@ -44,34 +44,34 @@ BUTTONS = {
 
    -- above pads
 
-   { id = 'track-select-1', cc = 20, palette = 'biled', group = 'track-select' },
-   { id = 'track-select-2', cc = 21, palette = 'biled', group = 'track-select' },
-   { id = 'track-select-3', cc = 22, palette = 'biled', group = 'track-select' },
-   { id = 'track-select-4', cc = 23, palette = 'biled', group = 'track-select' },
-   { id = 'track-select-5', cc = 24, palette = 'biled', group = 'track-select' },
-   { id = 'track-select-6', cc = 25, palette = 'biled', group = 'track-select' },
-   { id = 'track-select-7', cc = 26, palette = 'biled', group = 'track-select' },
-   { id = 'track-select-8', cc = 27, palette = 'biled', group = 'track-select' },
+   { id = 'track-select-1', cc = 20, palette = 'biled', group = 'track-select', x = 1 },
+   { id = 'track-select-2', cc = 21, palette = 'biled', group = 'track-select', x = 2 },
+   { id = 'track-select-3', cc = 22, palette = 'biled', group = 'track-select', x = 3 },
+   { id = 'track-select-4', cc = 23, palette = 'biled', group = 'track-select', x = 4 },
+   { id = 'track-select-5', cc = 24, palette = 'biled', group = 'track-select', x = 5 },
+   { id = 'track-select-6', cc = 25, palette = 'biled', group = 'track-select', x = 6 },
+   { id = 'track-select-7', cc = 26, palette = 'biled', group = 'track-select', x = 7 },
+   { id = 'track-select-8', cc = 27, palette = 'biled', group = 'track-select', x = 8 },
 
-   { id = 'track-state-1', cc = 102, palette = 'rgb', group = 'track-state' },
-   { id = 'track-state-2', cc = 103, palette = 'rgb', group = 'track-state' },
-   { id = 'track-state-3', cc = 104, palette = 'rgb', group = 'track-state' },
-   { id = 'track-state-4', cc = 105, palette = 'rgb', group = 'track-state' },
-   { id = 'track-state-5', cc = 106, palette = 'rgb', group = 'track-state' },
-   { id = 'track-state-6', cc = 107, palette = 'rgb', group = 'track-state' },
-   { id = 'track-state-7', cc = 108, palette = 'rgb', group = 'track-state' },
-   { id = 'track-state-8', cc = 109, palette = 'rgb', group = 'track-state' },
+   { id = 'track-state-1', cc = 102, palette = 'rgb', group = 'track-state', x = 1 },
+   { id = 'track-state-2', cc = 103, palette = 'rgb', group = 'track-state', x = 2 },
+   { id = 'track-state-3', cc = 104, palette = 'rgb', group = 'track-state', x = 3 },
+   { id = 'track-state-4', cc = 105, palette = 'rgb', group = 'track-state', x = 4 },
+   { id = 'track-state-5', cc = 106, palette = 'rgb', group = 'track-state', x = 5 },
+   { id = 'track-state-6', cc = 107, palette = 'rgb', group = 'track-state', x = 6 },
+   { id = 'track-state-7', cc = 108, palette = 'rgb', group = 'track-state', x = 7 },
+   { id = 'track-state-8', cc = 109, palette = 'rgb', group = 'track-state', x = 8 },
 
    -- right of pads
 
-   { id = 'measure-32t', cc = 43, palette = 'biled', group = 'measure' },
-   { id = 'measure-32',  cc = 42, palette = 'biled', group = 'measure' },
-   { id = 'measure-16t', cc = 41, palette = 'biled', group = 'measure' },
-   { id = 'measure-16',  cc = 40, palette = 'biled', group = 'measure' },
-   { id = 'measure-8t',  cc = 39, palette = 'biled', group = 'measure' },
-   { id = 'measure-8',   cc = 38, palette = 'biled', group = 'measure' },
-   { id = 'measure-4t',  cc = 37, palette = 'biled', group = 'measure' },
-   { id = 'measure-4',   cc = 36, palette = 'biled', group = 'measure' },
+   { id = 'measure-32t', cc = 43, palette = 'biled', group = 'measure', y = 8 },
+   { id = 'measure-32',  cc = 42, palette = 'biled', group = 'measure', y = 7 },
+   { id = 'measure-16t', cc = 41, palette = 'biled', group = 'measure', y = 6 },
+   { id = 'measure-16',  cc = 40, palette = 'biled', group = 'measure', y = 5 },
+   { id = 'measure-8t',  cc = 39, palette = 'biled', group = 'measure', y = 4 },
+   { id = 'measure-8',   cc = 38, palette = 'biled', group = 'measure', y = 3 },
+   { id = 'measure-4t',  cc = 37, palette = 'biled', group = 'measure', y = 2 },
+   { id = 'measure-4',   cc = 36, palette = 'biled', group = 'measure', y = 1 },
 
    -- rightmost column
 
@@ -82,8 +82,8 @@ BUTTONS = {
    { id = 'device', cc = 110 },
    { id = 'browse', cc = 111 },
 
-   { id = 'back', cc = 62 },
-   { id = 'forward', cc = 63 },
+   { id = 'back',    cc = 62, group = 'page' },
+   { id = 'forward', cc = 63, group = 'page' },
    { id = 'mute', cc = 60 },
    { id = 'solo', cc = 61 },
    { id = 'scales', cc = 58 },

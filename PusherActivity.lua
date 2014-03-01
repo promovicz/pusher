@@ -12,6 +12,10 @@ function PusherActivity:register(pusher)
    self.pusher = pusher
 end
 
+function PusherActivity:get_control(id)
+   return self.controls[id]
+end
+
 function PusherActivity:handle_all_controls()
    LOG("activity", self.id, "handles all controls")
    self.controls = self.pusher.controls
@@ -33,34 +37,6 @@ function PusherActivity:handle_control_group(group_id)
       self.states[control.id] = { }
    end
    return controls
-end
-
-function PusherActivity:set_color(id, color)
-   self.states[id].color = color
-end
-
-function PusherActivity:set_text(id, text)
-   self.states[id].text = text
-end
-
-function PusherActivity:set_text_4(id, parts, justify)
-   local chunks = self:format_parts(parts, 4, 17, justify)
-   self:set_text(
-      id,
-      chunks[1] .. chunks[2] ..
-      chunks[3] .. chunks[4]
-   )
-end
-
-function PusherActivity:set_text_8(id, parts, justify)
-   local chunks = self:format_parts(parts, 8, 8, justify)
-   self:set_text(
-      id,
-      chunks[1] .. " " .. chunks[2] ..
-      chunks[3] .. " " .. chunks[4] ..
-      chunks[5] .. " " .. chunks[6] ..
-      chunks[7] .. " " .. chunks[8]
-   )
 end
 
 -- default event handlers
