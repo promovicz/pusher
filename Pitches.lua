@@ -88,19 +88,15 @@ function build_scale_pitches(scale, key)
       -- compute offset from tonic
       local pitch_offset = (pitch_index - key_offset) % 12
 
-      LOG("pitch", pitch_index, "offset", pitch_offset)
-
       -- determine scale relationship
       local relationship = 'none'
       if (pitch_offset == 0) then
-         LOG("tonic")
          -- this pitch is the tonic and in the scale
          relationship = 'tonic'
       else
          -- check if this pitch is in the scale
          for _, p in pairs(scale.pitches) do
             if (p < 12 and p == pitch_offset) then
-               LOG("member")
                relationship = 'member'
             end
          end
