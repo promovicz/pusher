@@ -42,6 +42,7 @@ function NotesActivity:update()
    self:update_pads()
 end
 
+local min_octave = 0
 local max_octave = 8
 
 function NotesActivity:set_mode(mode)
@@ -89,7 +90,7 @@ function NotesActivity:octave_up()
 end
 
 function NotesActivity:octave_down()
-   self:set_octave(math.max(0, self.octave - 1))
+   self:set_octave(math.max(min_octave, self.octave - 1))
 end
 
 
