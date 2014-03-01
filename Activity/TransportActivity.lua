@@ -8,6 +8,10 @@ end
 function TransportActivity:register(pusher)
    PusherActivity.register(self, pusher)
 
+   self:handle_control('master')
+   self:handle_control('note')
+   self:handle_control('session')
+
    self:handle_control('metronome')
    self:handle_control('record')
    self:handle_control('play')
@@ -31,6 +35,11 @@ end
 function TransportActivity:update()
    LOG("TransportActivity: update()")
    local transport = renoise.song().transport
+
+   self.controls['master']:set_color('full')
+
+   self.controls['note']:set_color('full')
+   self.controls['session']:set_color('full')
 
    local metronome = self.controls['metronome']
    local record = self.controls['record']
@@ -75,6 +84,12 @@ function TransportActivity:on_button_press(control)
    end
    if(id == 'tap-tempo') then
       
+   end
+   if(id == 'note') then
+      self.pusher:mode_note()
+   end
+   if(id == 'session') then
+      self.pusher:mode_pattern()
    end
 
    self:update()

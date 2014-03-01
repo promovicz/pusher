@@ -20,11 +20,12 @@ function NotesActivity:register(pusher)
    LOG("NotesActivity: register()")
    PusherActivity.register(self, pusher)
 
+   self.pads = self:handle_control_group('pads')
+
    self:handle_control('scales')
+   self:handle_control('stop')
    self:handle_control('octave-up')
    self:handle_control('octave-down')
-
-   self.pads = self:handle_control_group('pads')
 
    self:reconfigure_scale()
 
@@ -36,6 +37,8 @@ function NotesActivity:update()
 
    local c
    c = self.controls['scales']
+   c:set_color('on')
+   c = self.controls['stop']
    c:set_color('on')
 
    self:update_octave()

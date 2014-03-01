@@ -32,6 +32,26 @@ function Pusher:release()
   self.midi:close()
 end
 
+function Pusher:mode_note()
+   self.activities = {self.a_notes, self.a_transport, self.a_root}
+   self:update()
+end
+function Pusher:mode_pattern()
+   self.activities = {self.a_pattern, self.a_transport, self.a_root}
+   self:update()
+end
+
+-- get the topmost handler for the control with the given id
+function Pusher:get_control_handler(id)
+   for _, activity in pairs(self.activities) do
+      local control = activity.controls[id]
+      if (control ~= nil) then
+         return activity
+      end
+   end
+   return nil
+end
+
 -- delegations to MIDI interface
 function Pusher:register_cc(cc, control)
    self.midi:register_cc(cc, control)
@@ -75,17 +95,6 @@ function Pusher:get_control_group(group_id)
       end
    end
    return result
-end
-
--- get the topmost handler for the control with the given id
-function Pusher:get_control_handler(id)
-   for _, activity in pairs(self.activity_stack) do
-      local control = activity.controls[id]
-      if (control ~= nil) then
-         return activity
-      end
-   end
-   return nil
 end
 
 -- get pad counting from bottom left
@@ -161,14 +170,18 @@ end
 function Pusher:initialize_activities()
    LOG("Pusher: initialize_activities()")
    -- create activities
-   local root = RootActivity()
-   root:register(self)
-   local transport = TransportActivity()
-   transport:register(self)
-   local m = NotesActivity()
-   m:register(self)
+   self.a_root = RootActivity()
+   self.a_root:register(self)
+   self.a_transport = TransportActivity()
+   self.a_transport:register(self)
+   self.a_notes = NotesActivity()
+   self.a_notes:register(self)
+   self.a_pattern = PatternActivity()
+   self.a_pattern:register(self)
+
    -- set up a static activity stack
-   self.activity_stack = {m, transport, root}
+   self.activities = {self.a_notes, self.a_transport, self.a_root}
+   self:update()
 end
 
 -- initialize the controller
@@ -176,9 +189,18 @@ function Pusher:initialize_device()
   LOG("Pusher: initialize_device()")
   -- switch device to live native mode
   self:send_sysex(SYSEX_START, SET_MODE_LIVE)
-  -- update all controls
+  -- invalidate and update all controls
   for i, c in pairs(self.controls) do
      c:invalidate()
      c:update()
   end
+end
+
+-- update all controls
+function Pusher:update()
+   local activities = self.activities
+   for i = #activities,1,-1 do
+      local a = activities[i]
+      a:update()
+   end
 end
