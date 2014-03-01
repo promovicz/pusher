@@ -1,3 +1,9 @@
+--
+-- Base class of all 'controls'
+--
+-- Every button, knob, pad or whatever on the Push is
+-- represented and controlled by some variant of this class.
+--
 
 class 'PusherControl'
 
