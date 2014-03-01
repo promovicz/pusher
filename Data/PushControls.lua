@@ -1,8 +1,11 @@
 
 DIALS = {
+   -- leftmost colum
+
    { id = 'tempo-knob', cc = 14, note = 10 },
    { id = 'swing-knob', cc = 15, note = 9 },
 
+   -- above display
    { id = 'knob-1', cc = 71, note = 0, group = 'knobs' },
    { id = 'knob-2', cc = 72, note = 1, group = 'knobs' },
    { id = 'knob-3', cc = 73, note = 2, group = 'knobs' },
@@ -12,6 +15,7 @@ DIALS = {
    { id = 'knob-7', cc = 77, note = 6, group = 'knobs' },
    { id = 'knob-8', cc = 78, note = 7, group = 'knobs' },
 
+   -- master
    { id = 'master-knob', cc = 79, note = 8 },
 }
 

@@ -1,7 +1,7 @@
 
 -- palette for monochromatic buttons
 --
--- Allows two brightness levels and two speeds of blinking.
+-- One color, two brightness levels, two blink speeds.
 --
 PALETTE_SIMPLE = {
    { name = 'black',     value = 0   },
@@ -18,6 +18,7 @@ PALETTE_SIMPLE = {
 
 -- palette for "two-LED" buttons
 --
+-- Four colours, two brightness levels, two blink speeds.
 -- 
 PALETTE_BILED = {
    { name = 'black', value = 0 },
@@ -54,6 +55,13 @@ PALETTE_BILED = {
    { name = 'off', alias = 'black' }
 }
 
+-- palette for "RGB" buttons
+--
+-- A few fixed colors (actually rather lame)
+--
+-- XXX Not complete - transcribe from Live
+-- XXX Should add true RGB values to table
+--
 PALETTE_RGB = {
    { name = 'black', value = 0 },
    { name = 'darkgrey', value = 1 },
