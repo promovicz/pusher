@@ -29,6 +29,7 @@ function TransportActivity:register(pusher)
 end
 
 function TransportActivity:update()
+   LOG("TransportActivity: update()")
    local transport = renoise.song().transport
 
    local metronome = self.controls['metronome']
@@ -97,13 +98,11 @@ function TransportActivity:on_dial_change(control, change)
       local v = master.prefx_volume
       local vold = v.value
       local vchg = change * 0.005
-      LOG("master chg", vchg)
       if (vchg < 0) then
          v.value = math.max(v.value_min, vold + vchg)
       else
          v.value = math.min(v.value_max, vold + vchg)
       end
-      LOG("master now", v.value)
    end
 
    self:update()

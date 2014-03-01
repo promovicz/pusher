@@ -34,7 +34,7 @@ function PatternActivity:register(pusher)
 end
 
 function PatternActivity:update()
-   LOG("pattern update")
+   LOG("PatternActivity: update()")
 
    local sequencer = renoise.song().sequencer
    local patterns = renoise.song().patterns
