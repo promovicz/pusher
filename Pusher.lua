@@ -214,10 +214,7 @@ function Pusher:initialize_controls()
      displays[index] = display
      display:register(self)
   end
-  local tick = function()
-     self:update_displays()
-  end
-  renoise.tool():add_timer(tick, 50)
+  renoise.tool():add_timer({self, self.update_displays}, 100)
   self.displays = displays
   -- pads
   local pads = { }
