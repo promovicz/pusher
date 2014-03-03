@@ -101,6 +101,54 @@ SCALE_DEFINITIONS = {
       name = "Major Pentatonic",
       pitches = { 0,2,4,7,9 }
    },
+   {
+      name = "Harmonic Minor",
+      pitches = { 0,2,3,5,7,8,11 }
+   },
+   {
+      name = "Melodic Minor",
+      pitches = { 0,2,3,5,7,9,11 }
+   },
+   {
+      name = "Super Locrian",
+      pitches = { 0,1,3,4,6,8,10 }
+   },
+   {
+      name = "Bhairav",
+      pitches = { 0,1,4,5,7,8,11 }
+   },
+   {
+      name = "Hungarian Minor",
+      pitches = { 0,2,3,6,7,8,11 }
+   },
+   {
+      name = "Minor Gypsy",
+      pitches = { 0,1,4,5,7,8,10 }
+   },
+   {
+      name = "Hirojoshi",
+      pitches = { 0,2,3,7,8 }
+   },
+   {
+      name = "In-Sen",
+      pitches = { 0,1,5,7,10 }
+   },
+   {
+      name = "Iwato",
+      pitches = { 0,1,5,6,10 }
+   },
+   {
+      name = "Kumoi",
+      pitches = { 0,2,3,7,9 }
+   },
+   {
+      name = "Pelog",
+      pitches = { 0,1,3,4,7,8 }
+   },
+   {
+      name = "Spanish",
+      pitches = { 0,1,3,4,5,6,8,10 }
+   }
 }
 
 function build_scale(definition)
