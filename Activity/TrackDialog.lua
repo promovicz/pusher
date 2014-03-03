@@ -90,16 +90,6 @@ function TrackDialog:update()
       parameters[5] = track.postfx_panning
    end
    self.parameters = parameters
-
    self:update_parameters()
-end
-
-function TrackDialog:update_parameters()
-   self:display_parameters(
-      self.parameters,
-      self.parameter_name,
-      self.parameter_graph,
-      self.parameter_value
-   )
 end
 

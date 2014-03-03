@@ -54,6 +54,15 @@ function DisplayActivity:adjust_parameter(parameter,change)
    end
 end
 
+function DisplayActivity:update_parameters()
+   self:display_parameters(
+      self.parameters,
+      self.parameter_name,
+      self.parameter_graph,
+      self.parameter_value
+   )
+end
+
 function DisplayActivity:display_parameters(parameters,names,graphs,values)
    for i in range(0,3) do
       local a = parameters[i*2+1]
