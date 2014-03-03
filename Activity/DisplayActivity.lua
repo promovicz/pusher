@@ -87,9 +87,25 @@ function DisplayActivity:display_parameter_value(parameter)
    end
 end
 function DisplayActivity:display_parameter_graph(parameter)
+   local width = 8
    if (parameter ~= nil) then
+      local value = parameter.value + math.abs(parameter.value_min)
+      local range = parameter.value_max + math.abs(parameter.value_min)
+      local step = range / (width + 1)
       if (parameter.polarity == renoise.DeviceParameter.POLARITY_UNIPOLAR) then
-         return "--------"
+         local steps = math.min(width, math.floor(value / step))
+         local limlo = ""
+         local limhi = ""
+         local space = width - steps
+         if (value == parameter.value_min) then
+            limlo = "0"
+            space = space - 1
+         end
+         if (value == parameter.value_max) then
+            limhi = "!"
+            steps = steps - 1
+         end
+         return limlo .. PIPES[steps + 1] .. limhi .. DASHES[space + 1]
       else
          return "--------"
       end
