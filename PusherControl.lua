@@ -1,5 +1,5 @@
 --
--- Base class of all 'controls'
+-- Representation of physical "controls"
 --
 -- Every button, knob, pad or whatever on the Push is
 -- represented and controlled by some variant of this class.

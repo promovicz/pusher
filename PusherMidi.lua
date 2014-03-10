@@ -46,11 +46,11 @@ end
 -- close MIDI ports
 function PusherMidi:close()
   -- close input
-  if (self.midi_in and self.midi_in.is_open) then
+  if (self.midi_in ~= nil and self.midi_in.is_open) then
     self.midi_in:close()
   end
   -- close output
-  if (self.midi_out and self.midi_out.is_open) then
+  if (self.midi_out ~= nil and self.midi_out.is_open) then
     self.midi_out:close()
   end
   -- drop references

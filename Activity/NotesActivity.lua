@@ -221,10 +221,8 @@ function NotesActivity:reconfigure_pads()
       local ox = 0
       local oy = 0
 
-      -- index of pad in 
-      local index = sx * (ox + x) + sy * (oy + y)
-
       -- compute the pitch for the pad
+      local index = sx * (ox + x) + sy * (oy + y)
       local offset = -1
       if (self.chromatic) then
          local o = math.floor(index / 12)
