@@ -79,10 +79,10 @@ function ScaleDialog:update()
    LOG("ScaleDialog: update()")
    local keys = KEYS_COMBINED
 
-   local button_prev = self:get_control("track-select-1")
-   local button_next = self:get_control("track-state-1")
-   local button_fixed = self:get_control("track-select-8")
-   local button_chromatic = self:get_control("track-state-8")
+   local button_prev = self:get_widget("track-select-1")
+   local button_next = self:get_widget("track-state-1")
+   local button_fixed = self:get_widget("track-select-8")
+   local button_chromatic = self:get_widget("track-state-8")
 
    local scale_index = self.notes.scale
    local scale = SCALES[scale_index]

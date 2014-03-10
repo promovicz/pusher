@@ -38,39 +38,39 @@ function TransportActivity:update()
 
    local c
 
-   self:get_control('note'):set_color('full')
-   self:get_control('session'):set_color('full')
+   self:get_widget('note'):set_color('full')
+   self:get_widget('session'):set_color('full')
 
-   self:get_control('master'):set_color('full')
+   self:get_widget('master'):set_color('full')
 
-   c = self:get_control('volume')
+   c = self:get_widget('volume')
    if (self.pusher:in_dialog('volume')) then
       c:set_color('full')
    else
       c:set_color('half')
    end
-   c = self:get_control('pan-send')
+   c = self:get_widget('pan-send')
    if (self.pusher:in_dialog('pan-send')) then
       c:set_color('full')
    else
       c:set_color('half')
    end
-   c = self:get_control('track')
+   c = self:get_widget('track')
    if (self.pusher:in_dialog('track')) then
       c:set_color('full')
    else
       c:set_color('half')
    end
-   c = self:get_control('device')
+   c = self:get_widget('device')
    if (self.pusher:in_dialog('device')) then
       c:set_color('full')
    else
       c:set_color('half')
    end
 
-   local metronome = self:get_control('metronome')
-   local record = self:get_control('record')
-   local play = self:get_control('play')
+   local metronome = self:get_widget('metronome')
+   local record = self:get_widget('record')
+   local play = self:get_widget('play')
 
    if (transport.metronome_enabled) then
       metronome:set_color('full')

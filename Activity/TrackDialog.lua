@@ -15,14 +15,14 @@ function TrackDialog:register(pusher)
    self.parameter_name  = self.line_a
    self.parameter_value = self.line_b
 
-   self.upper1 = self:get_control('display-1-3')
-   self.upper2 = self:get_control('display-2-3')
-   self.upper3 = self:get_control('display-3-3')
-   self.upper4 = self:get_control('display-4-3')
-   self.lower1 = self:get_control('display-1-4')
-   self.lower2 = self:get_control('display-2-4')
-   self.lower3 = self:get_control('display-3-4')
-   self.lower4 = self:get_control('display-4-4')
+   self.upper1 = self:get_widget('display-1-3')
+   self.upper2 = self:get_widget('display-2-3')
+   self.upper3 = self:get_widget('display-3-3')
+   self.upper4 = self:get_widget('display-4-3')
+   self.lower1 = self:get_widget('display-1-4')
+   self.lower2 = self:get_widget('display-2-4')
+   self.lower3 = self:get_widget('display-3-4')
+   self.lower4 = self:get_widget('display-4-4')
 
    local song = renoise.song()
    song.tracks_observable:add_notifier(self, TrackDialog.update)
@@ -55,7 +55,7 @@ function TrackDialog:update()
    local song = renoise.song()
    local track = song.selected_track
 
-   self:get_control('track'):set_color('full')
+   self:get_widget('track'):set_color('full')
 
    self.upper1:set_text("Track selection:", 1)
    self.upper2:set_text(track.name, 0)
@@ -78,7 +78,7 @@ function TrackDialog:update()
    self.lower3:set_split(names[5], names[6])
    self.lower4:set_split(names[7], names[8])
    for i = 1,8,1 do
-      self:get_control('track-select-' .. i):set_color(colors[i])
+      self:get_widget('track-select-' .. i):set_color(colors[i])
    end
 
    local parameters = { }

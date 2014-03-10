@@ -159,29 +159,6 @@ function Pusher:get_control_group(group_id)
    return result
 end
 
--- get pad counting from bottom left
-function Pusher:get_pad_bottom(x, y)
-   if (x >= 1 and x <= 8 and y >= 1 and y <= 8) then
-      return self.pads[y][x]
-   else
-      return nil
-   end
-end
-
--- get pad counting from top left
-function Pusher:get_pad_top(x, y)
-   if (x >= 1 and x <= 8 and y >= 1 and y <= 8) then
-      return self.pads[8 - (y - 1)][x]
-   else
-      return nil
-   end
-end
-
--- get the pad control for the given coordinates
-function Pusher:get_pad(x, y)
-   return self.controls['pad-' .. x .. '-' .. y]
-end
-
 -- create and register all controls
 function Pusher:initialize_controls()
   LOG("Pusher: initialize_controls()")
@@ -283,6 +260,12 @@ function Pusher:update()
 
    self.activities = activities
 
+   for i = #activities,1,-1 do
+      local a = activities[i]
+      if (a ~= nil) then
+         a:activate()
+      end
+   end
    for i = #activities,1,-1 do
       local a = activities[i]
       if (a ~= nil) then

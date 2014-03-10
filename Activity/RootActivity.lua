@@ -22,12 +22,12 @@ end
 
 function RootActivity:update()
    LOG("RootActivity: update()")
-   for _, control in pairs(self.controls) do
-      if (control.type == 'button' or control.type == 'pad') then
-         control:set_color('off')
+   for _, widget in pairs(self.widgets) do
+      if (widget.type == 'button' or widget.type == 'pad') then
+         widget:set_color('off')
       end
-      if (control.type == 'display') then
-         control:set_text(" ")
+      if (widget.type == 'display') then
+         widget:set_text(" ")
       end
    end
 end

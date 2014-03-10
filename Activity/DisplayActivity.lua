@@ -13,29 +13,39 @@ function DisplayActivity:register(pusher)
    self:handle_control_group('track-select')
    self:handle_control_group('track-state')
 
+   self.knobs = {
+      self:get_widget('knob-1'),
+      self:get_widget('knob-2'),
+      self:get_widget('knob-3'),
+      self:get_widget('knob-4'),
+      self:get_widget('knob-5'),
+      self:get_widget('knob-6'),
+      self:get_widget('knob-7'),
+      self:get_widget('knob-8')
+   }
    self.line_a = {
-      self:get_control('display-1-1'),
-      self:get_control('display-2-1'),
-      self:get_control('display-3-1'),
-      self:get_control('display-4-1')
+      self:get_widget('display-1-1'),
+      self:get_widget('display-2-1'),
+      self:get_widget('display-3-1'),
+      self:get_widget('display-4-1')
    }
    self.line_b = {
-      self:get_control('display-1-2'),
-      self:get_control('display-2-2'),
-      self:get_control('display-3-2'),
-      self:get_control('display-4-2')
+      self:get_widget('display-1-2'),
+      self:get_widget('display-2-2'),
+      self:get_widget('display-3-2'),
+      self:get_widget('display-4-2')
    }
    self.line_c = {
-      self:get_control('display-1-3'),
-      self:get_control('display-2-3'),
-      self:get_control('display-3-3'),
-      self:get_control('display-4-3')
+      self:get_widget('display-1-3'),
+      self:get_widget('display-2-3'),
+      self:get_widget('display-3-3'),
+      self:get_widget('display-4-3')
    }
    self.line_d = {
-      self:get_control('display-1-4'),
-      self:get_control('display-2-4'),
-      self:get_control('display-3-4'),
-      self:get_control('display-4-4')
+      self:get_widget('display-1-4'),
+      self:get_widget('display-2-4'),
+      self:get_widget('display-3-4'),
+      self:get_widget('display-4-4')
    }
 end
 

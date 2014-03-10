@@ -98,7 +98,7 @@ function PusherDisplayCell:__init(display, index, id)
 end
 
 function PusherDisplayCell:update()
-   PusherControl:update(self)
+   PusherControl.update(self)
    self.display:pull()
 end
 
@@ -116,13 +116,4 @@ function PusherDisplayCell:set_text(text, justify)
    self.text = text
    self.justify = justify
    self:update()
-end
-
-function PusherDisplayCell:set_split(ltext, rtext, ljust, rjust, separator)
-   if (separator == nil) then
-      separator = " "
-   end
-   local l = format_for_display(ltext, 8, ljust)
-   local r = format_for_display(rtext, 8, rjust)
-   self:set_text(l .. separator .. r, 0)
 end

@@ -35,9 +35,9 @@ function NotesActivity:update()
    LOG("NotesActivity: update()")
 
    local c
-   c = self.controls['scales']
+   c = self.widgets['scales']
    c:set_color('on')
-   c = self.controls['stop']
+   c = self.widgets['stop']
    c:set_color('on')
 
    self:update_octave()
@@ -144,8 +144,8 @@ end
 
 -- update octave buttons
 function NotesActivity:update_octave()
-   local up = self.controls['octave-up']
-   local dn = self.controls['octave-down']
+   local up = self.widgets['octave-up']
+   local dn = self.widgets['octave-down']
    if (self.octave == 0) then
       dn:set_color('off')
    else

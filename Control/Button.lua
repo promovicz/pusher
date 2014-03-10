@@ -7,11 +7,17 @@ function PusherButton:__init(id, cc, palette)
    self.palette = palette
    self.color = 'off'
    self.last_color = 'off'
+   self.pressed = false
 end
 
 function PusherButton:register(pusher)
    PusherControl.register(self, pusher)
    pusher:register_cc(self.cc, self)
+end
+
+function PusherButton:invalidate()
+   PusherControl.invalidate(self)
+   self.pressed = false
 end
 
 function PusherButton:update()
@@ -43,16 +49,18 @@ end
 
 function PusherButton:do_press()
    LOG("button pressed", self.id)
+   self.pressed = true
    local handler = self:get_handler()
-   if (handler ~= nil) then
-      handler:on_button_press(self)
+   if (handler ~= nil and self.widget ~= nil) then
+      handler:on_button_press(self.widget)
    end
 end
 
 function PusherButton:do_release()
    LOG("button released", self.id)
+   self.pressed = false
    local handler = self:get_handler()
-   if (handler ~= nil) then
-      handler:on_button_release(self)
+   if (handler ~= nil and self.widget ~= nil) then
+      handler:on_button_release(self.widget)
    end
 end

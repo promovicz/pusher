@@ -44,7 +44,7 @@ function VolumeDialog:update()
 
    local song = renoise.song()
 
-   self:get_control('volume'):set_color('full')
+   self:get_widget('volume'):set_color('full')
 
    local parameters = { }
    for i, t in pairs(song.tracks) do

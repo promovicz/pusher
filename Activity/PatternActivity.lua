@@ -37,7 +37,7 @@ function PatternActivity:update()
 
    for pady in range(1,8) do
       for padx in range(1,8) do
-         local pad = self.pusher:get_pad_top(padx, pady)
+         local pad = self:get_pad_top(padx, pady)
          local x = padx + self.xoff
          local y = pady + self.yoff
          if (y > #patseq or x > #tracks) then
@@ -59,25 +59,25 @@ function PatternActivity:update()
    end
 
    local c
-   c = self.controls['cursor-up']
+   c = self.widgets['cursor-up']
    if (self.yoff > 0) then
       c:set_color('on')
    else
       c:set_color('off')
    end
-   c = self.controls['cursor-down']
+   c = self.widgets['cursor-down']
    if (self.yoff + 8 < #patseq) then
       c:set_color('on')
    else
       c:set_color('off')
    end
-   c = self.controls['cursor-left']
+   c = self.widgets['cursor-left']
    if (self.xoff > 0) then
       c:set_color('on')
    else
       c:set_color('off')
    end
-   c = self.controls['cursor-right']
+   c = self.widgets['cursor-right']
    if (self.xoff + 8 < #tracks) then
       c:set_color('on')
    else

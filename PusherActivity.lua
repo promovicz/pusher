@@ -4,7 +4,7 @@ class 'PusherActivity'
 function PusherActivity:__init(id)
    self.id = id
    self.controls = {}
-   self.states = {}
+   self.widgets = {}
    self.pusher = nil
 end
 
@@ -12,31 +12,63 @@ function PusherActivity:register(pusher)
    self.pusher = pusher
 end
 
-function PusherActivity:get_control(id)
-   return self.controls[id]
+function PusherActivity:activate()
+   for index, widget in pairs(self.widgets) do
+      widget:activate()
+   end
+end
+
+function PusherActivity:get_widget(id)
+   return self.widgets[id]
+end
+
+-- get pad counting from top left
+function PusherActivity:get_pad_top(x, y)
+   if (x >= 1 and x <= 8 and y >= 1 and y <= 8) then
+      return self.widgets["pad-" .. x .. "-" .. 9 - y]
+   else
+      return nil
+   end
+end
+
+-- get pad counting from bottom left
+function PusherActivity:get_pad_bottom(x, y)
+   if (x >= 1 and x <= 8 and y >= 1 and y <= 8) then
+      return self.widgets["pad-" .. x .. "-" .. y]
+   else
+      return nil
+   end
 end
 
 function PusherActivity:handle_all_controls()
    LOG("activity", self.id, "handles all controls")
    self.controls = self.pusher.controls
+   self.widgets = { }
+   for _, control in pairs(self.controls) do
+      self.widgets[control.id] = PusherWidget(self, control)
+   end
 end
 
 function PusherActivity:handle_control(id)
    local control = self.pusher:get_control(id)
    LOG("activity", self.id, "handles control", control.id)
+   local widget = PusherWidget(self, control)
    self.controls[id] = control
-   self.states[id] = { }
-   return control
+   self.widgets[id] = widget
+   return widget
 end
 
 function PusherActivity:handle_control_group(group_id)
    LOG("activity", self.id, "handles group", group_id)
    local controls = self.pusher:get_control_group(group_id)
-   for _, control in pairs(controls) do
+   local widgets = { }
+   for index, control in pairs(controls) do
+      local widget = PusherWidget(self, control)
       self.controls[control.id] = control
-      self.states[control.id] = { }
+      self.widgets[control.id] = widget
+      widgets[index] = widget
    end
-   return controls
+   return widgets
 end
 
 -- default event handlers

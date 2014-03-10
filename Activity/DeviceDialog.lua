@@ -1,13 +1,13 @@
 
-class 'DeviceDialog' (PusherActivity)
+class 'DeviceDialog' (DisplayActivity)
 
 function DeviceDialog:__init()
-   PusherActivity.__init(self, 'device')
+   DisplayActivity.__init(self, 'device')
 end
 
 function DeviceDialog:register(pusher)
    LOG("DeviceDialog: register()")
-   PusherActivity.register(self, pusher)
+   DisplayActivity.register(self, pusher)
 
    self:handle_control('device')
    self:handle_control_group('display')
@@ -15,16 +15,16 @@ function DeviceDialog:register(pusher)
    self:handle_control_group('track-select')
 
    self.display_name = {
-      self:get_control('display-1-1'),
-      self:get_control('display-2-1'),
-      self:get_control('display-3-1'),
-      self:get_control('display-4-1')
+      self:get_widget('display-1-1'),
+      self:get_widget('display-2-1'),
+      self:get_widget('display-3-1'),
+      self:get_widget('display-4-1')
    }
    self.display_graph = {
-      self:get_control('display-1-2'),
-      self:get_control('display-2-2'),
-      self:get_control('display-3-2'),
-      self:get_control('display-4-2')
+      self:get_widget('display-1-2'),
+      self:get_widget('display-2-2'),
+      self:get_widget('display-3-2'),
+      self:get_widget('display-4-2')
    }
 end
 

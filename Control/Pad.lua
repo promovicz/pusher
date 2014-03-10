@@ -53,23 +53,23 @@ end
 function PusherPad:do_press(value)
    LOG("pad pressed", self.id, value)
    local handler = self:get_handler()
-   if (handler ~= nil) then
-      handler:on_pad_press(self, value)
+   if (handler ~= nil and self.widget ~= nil) then
+      handler:on_pad_press(self.widget, value)
    end
 end
 
 function PusherPad:do_release()
    LOG("pad released", self.id)
    local handler = self:get_handler()
-   if (handler ~= nil) then
-      handler:on_pad_release(self)
+   if (handler ~= nil and self.widget ~= nil) then
+      handler:on_pad_release(self.widget)
    end
 end
 
 function PusherPad:do_aftertouch(value)
    LOG("pad aftertouch", self.id, value)
    local handler = self:get_handler()
-   if (handler ~= nil) then
-      handler:on_pad_aftertouch(self, value)
+   if (handler ~= nil and self.widget ~= nil) then
+      handler:on_pad_aftertouch(self.widget, value)
    end
 end

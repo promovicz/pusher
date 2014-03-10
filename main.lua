@@ -14,6 +14,7 @@ require "Pusher"
 require "PusherActivity"
 require "PusherControl"
 require "PusherMidi"
+require "PusherWidget"
 
 require "Activity/RootActivity"
 require "Activity/TransportActivity"
