@@ -9,26 +9,48 @@ function VolumeDialog:register(pusher)
    LOG("VolumeDialog: register()")
    DisplayActivity.register(self, pusher)
 
-   self.parameter_name  = self.line_a
-   self.parameter_value = self.line_b
+   self.track_name      = self.line_a
+   self.track_status    = self.line_d
+
+   self.parameter_name  = self.line_b
+   self.parameter_value = self.line_c
 
    self:handle_control('volume')
 
+   self:mode_reset()
+
    local song = renoise.song()
-   song.tracks_observable:add_notifier(self, VolumeDialog.update)
+   song.tracks_observable:add_notifier(self, VolumeDialog.ob_tracks_changed)
+end
+
+function VolumeDialog:mode_reset()
+   self.mode = 'post'
+end
+
+function VolumeDialog:mode_next()
+   local old = self.mode
+   local new = old
+   if old == 'post' then
+      new = 'pre'
+   elseif old == 'pre' then
+      new = 'post'
+   end
+   self.mode = new
+   self:update()
+end
+
+function VolumeDialog:ob_tracks_changed()
+   self:update()
+end
+
+function VolumeDialog:on_dialog_show()
+   self:mode_reset()
 end
 
 function VolumeDialog:on_button_press(control)
    local id = control.id
    if (id == 'volume') then
-   end
-end
-function VolumeDialog:on_dial_touch(control)
-   if (control.group == 'knobs') then
-   end
-end
-function VolumeDialog:on_dial_release(control)
-   if (control.group == 'knobs') then
+      self:mode_next()
    end
 end
 function VolumeDialog:on_dial_change(control, change)
@@ -43,13 +65,28 @@ function VolumeDialog:update()
    LOG("VolumeDialog: update()")
 
    local song = renoise.song()
+   local tracks = song.tracks
 
    self:get_widget('volume'):set_color('full')
 
-   local parameters = { }
-   for i, t in pairs(song.tracks) do
-      parameters[i] = t.prefx_volume
+   for i, d in pairs(self.line_c) do
+      d:set_text("")
    end
+
+   local parameters = { }
+   local names = { }
+   for i, t in pairs(tracks) do
+      names[i] = t.name
+      if self.mode == 'post' then
+         parameters[i] = t.postfx_volume
+      elseif self.mode == 'pre' then
+         parameters[i] = t.prefx_volume
+      end
+   end
+   self.track_name[1]:set_split(names[1], names[2])
+   self.track_name[2]:set_split(names[3], names[4])
+   self.track_name[3]:set_split(names[5], names[6])
+   self.track_name[4]:set_split(names[7], names[8])
    self.parameters = parameters
    self:update_parameters()
 end

@@ -3,7 +3,10 @@
 -- all push sysex commands begin with this
 SYSEX_START = {240, 71, 127, 21}
 
--- mode Switching
+-- variable-length commands use this terminator
+SYSEX_END = {247}
+
+-- Mode switching
 --
 -- The Push has two modes, "Live" mode and user mode.
 --
@@ -15,6 +18,19 @@ SYSEX_START = {240, 71, 127, 21}
 SET_MODE_LIVE = {98, 0, 1, 0}
 SET_MODE_USER = {98, 0, 1, 1}
 
+-- Ribbon modes
+RIBBON_SET_MODE = {99, 0, 1}
+RIBBON_SET_LEDS = {100, 0, 8}
+
+RIBBON_MODE_CUSTOM_PITCHBEND = 0
+RIBBON_MODE_CUSTOM_VOLUME = 1
+RIBBON_MODE_CUSTOM_PAN = 2
+RIBBON_MODE_CUSTOM_DISCRETE = 3
+RIBBON_MODE_CUSTOM_FREE = 4
+RIBBON_MODE_PITCHBEND = 5
+RIBBON_MODE_VOLUME = 6
+RIBBON_MODE_PAN = 7
+RIBBON_MODE_DISCRETE = 8
 
 -- Display Operations
 --
@@ -39,6 +55,3 @@ DISPLAY_WRITE = {
  {26, 0, 69, 0},
  {27, 0, 69, 0}
 }
-
--- display write terminator
-DISPLAY_WRITE_END = {247}

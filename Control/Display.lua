@@ -1,3 +1,17 @@
+--
+-- Representation of the display
+--
+-- Display is organized as 4 lines with 4 segments each.
+--
+-- Each segment is comprised of 17 characters, which
+-- makes it split nicely into two parts of 8 characters.
+--
+-- We therefore represent display cells of either 17 or 8 characters.
+-- Activities can decide what variant to use.
+--
+-- Note that display updates are timer-driven as a special hack
+-- to prevent update issues with older push firmwares.
+--
 
 class 'PusherDisplay'
 
@@ -83,7 +97,7 @@ end
 
 function PusherDisplay:do_write()
    self.pusher:send_sysex(
-      SYSEX_START, self.write_op, self.line, DISPLAY_WRITE_END)
+      SYSEX_START, self.write_op, self.line, SYSEX_END)
 end
 
 

@@ -1,3 +1,6 @@
+--
+-- Representation of attack-sensitive aftertouching pads
+--
 
 class 'PusherPad' (PusherControl)
 
@@ -19,7 +22,7 @@ end
 function PusherPad:update()
    local color = self.color
    if (self.invalid or (self.last_color ~= color)) then
-      -- LOG("pad", self.id, "color", color)
+      self:log_o("color", color)
       self.pusher:send_note(self.note, self.palette[color].value)
       self.last_color = color
       self.invalid = false
@@ -51,7 +54,7 @@ function PusherPad:on_note_aftertouch(note, value)
 end
 
 function PusherPad:do_press(value)
-   LOG("pad pressed", self.id, value)
+   self:log_i("pressed", value)
    local handler = self:get_handler()
    if (handler ~= nil and self.widget ~= nil) then
       handler:on_pad_press(self.widget, value)
@@ -59,7 +62,7 @@ function PusherPad:do_press(value)
 end
 
 function PusherPad:do_release()
-   LOG("pad released", self.id)
+   self:log_i("released")
    local handler = self:get_handler()
    if (handler ~= nil and self.widget ~= nil) then
       handler:on_pad_release(self.widget)
@@ -67,7 +70,7 @@ function PusherPad:do_release()
 end
 
 function PusherPad:do_aftertouch(value)
-   LOG("pad aftertouch", self.id, value)
+   self:log_i("aftertouch", value)
    local handler = self:get_handler()
    if (handler ~= nil and self.widget ~= nil) then
       handler:on_pad_aftertouch(self.widget, value)

@@ -1,8 +1,9 @@
 
 require "Globals"
 require "Definitions"
-require "Pitches"
 
+require "Data/Characters"
+require "Data/Pitches"
 require "Data/PushColors"
 require "Data/PushCommands"
 require "Data/PushControls"
@@ -31,6 +32,7 @@ require "Control/Button"
 require "Control/Dial"
 require "Control/Display"
 require "Control/Pad"
+require "Control/Ribbon"
 
 local pusher = nil
 

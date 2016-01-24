@@ -1,7 +1,12 @@
 --
 -- Representation of logical "widgets"
 --
--- Each of these represents one specific function of a control.
+-- These are not physical controls but instead the
+-- virtual equivalent that belongs to each activity
+-- that uses the control.
+--
+-- This allows for control state to be retained
+-- even if an activity goes into background.
 --
 
 class 'PusherWidget'
@@ -16,18 +21,20 @@ function PusherWidget:__init(activity, control)
    self.x = control.x
    self.y = control.y
    self.group = control.group
+
+   self.text = ""
+   self.justify = 0
+   self.color = 'off'
 end
 
 function PusherWidget:activate()
-   if not self:is_active() then
-      self.control.widget = self
-      self:update()
-   end
+   self.control.widget = self
 end
 
 function PusherWidget:is_active()
    local c = self.control
-   return c.widget ~= nil and c.widget.aid == self.aid
+   local w = c.widget
+   return w ~= nil and w.aid == self.aid
 end
 
 function PusherWidget:update()

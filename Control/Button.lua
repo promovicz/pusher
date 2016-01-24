@@ -1,3 +1,6 @@
+--
+-- Representation of regular pushbuttons
+--
 
 class 'PusherButton' (PusherControl)
 
@@ -24,7 +27,7 @@ function PusherButton:update()
    local color = self.color
    if (self.invalid or (self.last_color ~= color)) then
       local defn = self.palette[color]
-      -- LOG("button", self.id, "color", color, "really", defn.name)
+      self:log_o("color", color)
       self.pusher:send_cc(self.cc, defn.value)
       self.last_color = color
       self.invalid = false
@@ -48,7 +51,7 @@ function PusherButton:on_cc(control, value)
 end
 
 function PusherButton:do_press()
-   LOG("button pressed", self.id)
+   self:log_i("pressed")
    self.pressed = true
    local handler = self:get_handler()
    if (handler ~= nil and self.widget ~= nil) then
@@ -57,7 +60,7 @@ function PusherButton:do_press()
 end
 
 function PusherButton:do_release()
-   LOG("button released", self.id)
+   self:log_i("released")
    self.pressed = false
    local handler = self:get_handler()
    if (handler ~= nil and self.widget ~= nil) then

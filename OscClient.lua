@@ -30,7 +30,7 @@ function OscClient:__init(osc_host,osc_port)
 
 	local client, socket_error = renoise.Socket.create_client(osc_host, osc_port, renoise.Socket.PROTOCOL_UDP)
 	if (socket_error) then 
-    renoise.app():show_warning("Warning: Duplex failed to start the internal OSC client")
+    renoise.app():show_warning("Warning: Pusher failed to start the internal OSC client")
     self._connection = nil
 	else
     self._connection = client

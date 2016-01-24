@@ -19,12 +19,14 @@ function TransportActivity:register(pusher)
    self:handle_control('note')
    self:handle_control('session')
 
+   self:handle_control('master-knob')
+
+   self:handle_control('tap-tempo')
+   self:handle_control('tempo-knob')
    self:handle_control('metronome')
+
    self:handle_control('record')
    self:handle_control('play')
-   self:handle_control('tempo-knob')
-   self:handle_control('master-knob')
-   self:handle_control('tap-tempo')
 
    local transport = renoise.song().transport
    transport.metronome_enabled_observable:add_notifier(self, TransportActivity.update)
@@ -38,8 +40,18 @@ function TransportActivity:update()
 
    local c
 
-   self:get_widget('note'):set_color('full')
-   self:get_widget('session'):set_color('full')
+   c = self:get_widget('note')
+   if (self.pusher:in_mode('notes')) then
+      c:set_color('full')
+   else
+      c:set_color('half')
+   end
+   c = self:get_widget('session')
+   if (self.pusher:in_mode('pattern')) then
+      c:set_color('full')
+   else
+      c:set_color('half')
+   end
 
    self:get_widget('master'):set_color('full')
 
@@ -87,6 +99,11 @@ function TransportActivity:update()
    else
       play:set_color('half')
    end
+end
+
+function TransportActivity:on_mode_change(activity)
+   LOG("TransportActivity: on_mode_change(", activity.id, ")")
+   self:update()
 end
 
 function TransportActivity:on_button_press(control)

@@ -25,22 +25,19 @@ function TrackDialog:register(pusher)
    self.lower4 = self:get_widget('display-4-4')
 
    local song = renoise.song()
-   song.tracks_observable:add_notifier(self, TrackDialog.update)
-   song.selected_track_observable:add_notifier(self, TrackDialog.update)
+   song.tracks_observable:add_notifier(self, TrackDialog.on_tracks_changed)
+   song.selected_track_observable:add_notifier(self, TrackDialog.on_selected_track_changed)
 end
 
 function TrackDialog:on_button_press(control)
    if (control.id == 'track') then
    end
+   if (control.id == 'back') then
+   end
+   if (control.id == 'forward') then
+   end
    if (control.group == 'track-select') then
-   end
-end
-function TrackDialog:on_dial_touch(control)
-   if (control.group == 'knobs') then
-   end
-end
-function TrackDialog:on_dial_release(control)
-   if (control.group == 'knobs') then
+      renoise.song().selected_track_index = control.x
    end
 end
 function TrackDialog:on_dial_change(control, change)
@@ -51,13 +48,22 @@ function TrackDialog:on_dial_change(control, change)
    end
 end
 
+function TrackDialog:on_tracks_changed()
+   self:update()
+end
+function TrackDialog:on_selected_track_changed()
+   self:update()
+end
+
 function TrackDialog:update()
    local song = renoise.song()
    local track = song.selected_track
 
+   self.tracks = song.tracks
+
    self:get_widget('track'):set_color('full')
 
-   self.upper1:set_text("Track selection:", 1)
+   self.upper1:set_text("Selected track:", 1)
    self.upper2:set_text(track.name, 0)
    self.upper3:set_text()
    self.upper4:set_text()
@@ -82,6 +88,7 @@ function TrackDialog:update()
    end
 
    local parameters = { }
+   local touched = { false, false, false, false, false, false, false, false }
    if (track ~= nil) then
       parameters[1] = track.prefx_volume
       parameters[2] = track.prefx_panning
@@ -90,6 +97,6 @@ function TrackDialog:update()
       parameters[5] = track.postfx_panning
    end
    self.parameters = parameters
+   self.touched = touched
    self:update_parameters()
 end
-

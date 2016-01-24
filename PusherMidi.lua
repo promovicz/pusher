@@ -18,6 +18,7 @@ function PusherMidi:__init(port_in, port_out)
    -- MIDI handler tables
    self.handlers_cc = {}
    self.handlers_note = {}
+   self.handler_bend = nil
    -- MIDI channel
    self.default_midi_channel = 1
 end
@@ -68,6 +69,11 @@ function PusherMidi:register_note(note, control)
    self.handlers_note[note] = control
 end
 
+-- register a control as a MIDI pitch bend handler
+function PusherMidi:register_bend(control)
+   self.handler_bend = control
+end
+
 -- callback for incoming midi events
 function PusherMidi:midi_callback(message)
   if (message[1] >= 128) and (message[1] <= 159) then
@@ -80,7 +86,7 @@ function PusherMidi:midi_callback(message)
         -- note on
         channel = message[1]-143
         if (self.dump_midi) then
-           LOG(("Pusher: recv CH %X NOTE %X ON %X"):format(channel, note, value))
+           LOG(("Pusher: recv CH %d NOTE %d ON %X"):format(channel, note, value))
         end
         if (handler ~= nil) then
            handler:on_note_on(note, value)
@@ -89,7 +95,7 @@ function PusherMidi:midi_callback(message)
         -- note off
         channel = message[1]-127
         if (self.dump_midi) then
-           LOG(("Pusher: recv CH %X NOTE %X OFF %X"):format(channel, note, value))
+           LOG(("Pusher: recv CH %d NOTE %d OFF %X"):format(channel, note, value))
         end
         if (handler ~= nil) then
            handler:on_note_off(note, value)
@@ -103,7 +109,7 @@ function PusherMidi:midi_callback(message)
      value = message[3]
      handler = self.handlers_note[note]
      if (self.dump_midi) then
-        LOG(("Pusher: recv CH %X NOTE %X AFTERTOUCH %X"):format(channel, note, value))
+        LOG(("Pusher: recv CH %d NOTE %d AFTERTOUCH %X"):format(channel, note, value))
      end
      if (handler ~= nil) then
         handler:on_note_aftertouch(note, value)
@@ -116,7 +122,7 @@ function PusherMidi:midi_callback(message)
      value = message[3]
      handler = self.handlers_cc[control]
      if (self.dump_midi) then
-        LOG(("Pusher: recv CH %X CONTROL %X VALUE %X"):format(channel, control, value))
+        LOG(("Pusher: recv CH %d CONTROL %d VALUE %X"):format(channel, control, value))
      end
      if (handler ~= nil) then
         handler:on_cc(control, value)
@@ -127,15 +133,19 @@ function PusherMidi:midi_callback(message)
      channel = message[1]-207
      value = message[2]
      if (self.dump_midi) then
-        LOG(("Pusher: recv CH %X PRESSURE %X"):format(channel, value))
+        LOG(("Pusher: recv CH %d PRESSURE %X"):format(channel, value))
      end
   elseif (message[1]>=224) and (message[1]<=239) then
      -- pitch bend
-     local channel, value
+     local channel, value, handler
      channel = message[1] - 223
      value = message[3] * 128 + message[2]
+     handler = self.handler_bend
      if (self.dump_midi) then
-        LOG(("Pusher: recv CH %X BEND %X"):format(channel, value))
+        LOG(("Pusher: recv CH %d BEND %d"):format(channel, value))
+     end
+     if (handler ~= nil) then
+        handler:on_bend(value)
      end
   else
      -- unsupported - ignored
@@ -172,23 +182,23 @@ function PusherMidi:send_note(key,velocity,channel)
 
   key = math.floor(key)
   velocity = math.floor(velocity)
-  
+
   local message = {nil, key, velocity}
-  
-  -- some devices cannot cope with note-off messages 
+
+  -- some devices cannot cope with note-off messages
   -- being note-on messages with zero velocity...
   if (velocity == 0) and not (self.allow_zero_velocity_note_on) then
     message[1] = 0x7F+channel -- note off
   else
     message[1] = 0x8F+channel -- note-on
   end
-  
+
   if(self.dump_midi)then
      LOG(("Pusher: send MIDI %X %X %X"):format(
             message[1], message[2], message[3]))
   end
 
-  self.midi_out:send(message) 
+  self.midi_out:send(message)
 end
 
 function PusherMidi:send_sysex(...)

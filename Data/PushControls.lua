@@ -31,8 +31,8 @@ BUTTONS = {
    { id = 'quantize', cc = 116 },
 
    { id = 'fixed-length', cc = 90 },
-   { id = 'duplicate', cc = 89 },
-   { id = 'automation', cc = 88 },
+   { id = 'automation', cc = 89 },
+   { id = 'duplicate', cc = 88 },
    { id = 'new', cc = 87 },
    { id = 'record', cc = 86 },
    { id = 'play', cc = 85 },

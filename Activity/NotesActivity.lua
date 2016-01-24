@@ -1,4 +1,4 @@
--- 
+--
 -- NotesActivity - note playing with pads
 --
 
@@ -23,6 +23,11 @@ function NotesActivity:register(pusher)
 
    self.pads = self:handle_control_group('pads')
 
+   self:handle_control('ribbon')
+
+   self:handle_control('solo')
+   self:handle_control('mute')
+
    self:handle_control('scales')
    self:handle_control('stop')
    self:handle_control('octave-up')
@@ -35,10 +40,19 @@ function NotesActivity:update()
    LOG("NotesActivity: update()")
 
    local c
-   c = self.widgets['scales']
-   c:set_color('on')
+   c = self.widgets['solo']
+   c:set_color('half')
+   c = self.widgets['mute']
+   c:set_color('half')
    c = self.widgets['stop']
-   c:set_color('on')
+   c:set_color('full')
+
+   c = self.widgets['scales']
+   if (self.pusher:in_dialog('scale')) then
+      c:set_color('full')
+   else
+      c:set_color('half')
+   end
 
    self:update_octave()
    self:update_pads()
@@ -105,7 +119,6 @@ end
 function NotesActivity:octave_down()
    self:set_octave(math.max(min_octave, self.octave - 1))
 end
-
 
 -- handle button press
 function NotesActivity:on_button_press(control)

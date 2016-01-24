@@ -11,10 +11,8 @@ function ScaleDialog:register(pusher)
 
    self.notes = pusher.a_notes
 
-   self:handle_control('scales')
-
    self.track_select = self:handle_control_group('track-select')
-   self.track_state = self:handle_control_group('track-state')
+   self.track_state  = self:handle_control_group('track-state')
 
    -- Prev C  G  D  A  E  B  Fixed
    -- Next F  Bb Eb Ab Db Gb Chromatic

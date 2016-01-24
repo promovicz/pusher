@@ -1,3 +1,6 @@
+--
+-- Definitions of pitches, scales, keys and their relationships
+--
 
 -- names of all keys in "sharp" notation
 KEYS_SHARP = {
@@ -36,7 +39,7 @@ function build_pitches()
       local key = midinote % 12 + 1
       local pitch = {
          midi = midinote,
-         octave = octave, 
+         octave = octave,
          key = key
       }
       pitches[midinote + 1] = pitch
@@ -151,21 +154,24 @@ SCALE_DEFINITIONS = {
    }
 }
 
+-- process a scale definition into the final object
 function build_scale(definition)
    definition.length = #definition.pitches
    definition.diatonic = definition.length == 8 and definition.pitches[8] == 12
    return definition
 end
 
-function build_scales()
+-- process the given scale definitions into scale objects
+function build_scales(definitions)
    local scales = { }
-   for _, definition in pairs(SCALE_DEFINITIONS) do
+   for _, definition in pairs(definitions) do
       scales[_] = build_scale(definition)
    end
    return scales
 end
 
-SCALES = build_scales()
+-- scale objects
+SCALES = build_scales(SCALE_DEFINITIONS)
 SCALE_MIN = 1
 SCALE_MAX = #SCALES
 
@@ -175,7 +181,7 @@ function build_scale_pitches(scale, key)
    local scalepitches = { }
 
    local key_offset = key - 1
-   
+
    for _, pitch in pairs(PITCHES) do
       -- index of this pitch
       local pitch_index = pitch.midi

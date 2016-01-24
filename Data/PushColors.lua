@@ -19,7 +19,7 @@ PALETTE_SIMPLE = {
 -- palette for "two-LED" buttons
 --
 -- Four colours, two brightness levels, two blink speeds.
--- 
+--
 PALETTE_BILED = {
    { name = 'black', value = 0 },
 
@@ -152,7 +152,7 @@ PALETTE_RGB = {
    { name = 'grey2', value = 117, rgb = { 64, 64, 64}},
    { name = 'grey3', value = 118, rgb = {117,117,117}},
    { name = 'grey4', alias = "c2"},
-   
+
    { name = 'darkgrey',  alias = 'grey1'},
    { name = 'grey',      alias = 'grey2'},
    { name = 'lightgrey', alias = 'grey4'},

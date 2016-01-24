@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<RenoiseScriptingTool>
-  <ApiVersion>3.0</ApiVersion>
+<RenoiseScriptingTool doc_version="0">
+  <ApiVersion>5</ApiVersion>
+  <AutoUpgraded>true</AutoUpgraded>
   <Id>com.renoise.Pusher</Id>
-  <Version>0.1</Version>
+  <Version>0.10000000000000001</Version>
   <Author>prom [prom@berlin.ccc.de]</Author>
   <Name>Pusher</Name>
   <Category>Midi Controllers</Category>
   <Description>Specialized interface for the Ableton Push</Description>
-  <Icon />
 </RenoiseScriptingTool>

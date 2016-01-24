@@ -1,12 +1,12 @@
--- 
+--
 -- RootActivity - disable-all-controls base activity
--- 
+--
 -- Akin to an empty canvas, this activity sets all controls
 -- to their default "off" states so that we have something
 -- sane to fall back on.
 --
 -- It will also highlight buttons when they are pressed.
--- 
+--
 
 class "RootActivity" (PusherActivity)
 

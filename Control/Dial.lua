@@ -1,3 +1,6 @@
+--
+-- Representation of touchable dials
+--
 
 class 'PusherDial' (PusherControl)
 
@@ -38,7 +41,7 @@ function PusherDial:on_note_on(note, value)
 end
 
 function PusherDial:do_touch()
-   LOG("dial touched", self.id)
+   self:log_i("touched")
    self.touched = true
    local handler = self:get_handler()
    if (handler ~= nil and self.widget ~= nil) then
@@ -47,7 +50,7 @@ function PusherDial:do_touch()
 end
 
 function PusherDial:do_release()
-   LOG("dial released", self.id)
+   self:log_i("released")
    self.touched = false
    local handler = self:get_handler()
    if (handler ~= nil and self.widget ~= nil) then
@@ -56,7 +59,7 @@ function PusherDial:do_release()
 end
 
 function PusherDial:do_change(change)
-   LOG("dial changed", self.id, change)
+   self:log_i("changed", change)
    local handler = self:get_handler()
    if (handler ~= nil and self.widget ~= nil) then
       handler:on_dial_change(self.widget, change)

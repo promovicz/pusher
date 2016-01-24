@@ -8,6 +8,10 @@ function PusherActivity:__init(id)
    self.pusher = nil
 end
 
+function PusherActivity:log(...)
+   print("activity", self.id, ...)
+end
+
 function PusherActivity:register(pusher)
    self.pusher = pusher
 end
@@ -15,6 +19,12 @@ end
 function PusherActivity:activate()
    for index, widget in pairs(self.widgets) do
       widget:activate()
+   end
+end
+
+function PusherActivity:redraw()
+   for index, widget in pairs(self.widgets) do
+      widget:update()
    end
 end
 
@@ -41,7 +51,7 @@ function PusherActivity:get_pad_bottom(x, y)
 end
 
 function PusherActivity:handle_all_controls()
-   LOG("activity", self.id, "handles all controls")
+   self:log("handles all controls")
    self.controls = self.pusher.controls
    self.widgets = { }
    for _, control in pairs(self.controls) do
@@ -51,7 +61,7 @@ end
 
 function PusherActivity:handle_control(id)
    local control = self.pusher:get_control(id)
-   LOG("activity", self.id, "handles control", control.id)
+   self:log("handles control", control.id)
    local widget = PusherWidget(self, control)
    self.controls[id] = control
    self.widgets[id] = widget
@@ -59,7 +69,7 @@ function PusherActivity:handle_control(id)
 end
 
 function PusherActivity:handle_control_group(group_id)
-   LOG("activity", self.id, "handles group", group_id)
+   self:log("handles group", group_id)
    local controls = self.pusher:get_control_group(group_id)
    local widgets = { }
    for index, control in pairs(controls) do
@@ -71,7 +81,19 @@ function PusherActivity:handle_control_group(group_id)
    return widgets
 end
 
--- default event handlers
+-- Dummy global event handlers
+function PusherActivity:on_mode_change(activity)
+end
+
+-- Dummy activity event handlers
+function PusherActivity:on_dialog_show()
+   self:log("show")
+end
+function PusherActivity:on_dialog_hide()
+   self:log("hide")
+end
+
+-- Dummy control event handlers
 function PusherActivity:on_button_press(control)
 end
 function PusherActivity:on_button_release(control)
@@ -81,6 +103,12 @@ end
 function PusherActivity:on_dial_release(control)
 end
 function PusherActivity:on_dial_change(control, change)
+end
+function PusherActivity:on_ribbon_touch(control)
+end
+function PusherActivity:on_ribbon_release(control)
+end
+function PusherActivity:on_ribbon_bend(control)
 end
 function PusherActivity:on_pad_press(control, value)
 end

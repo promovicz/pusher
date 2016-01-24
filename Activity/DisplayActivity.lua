@@ -10,8 +10,14 @@ function DisplayActivity:register(pusher)
 
    self:handle_control_group('display')
    self:handle_control_group('knobs')
+   self:handle_control_group('page')
    self:handle_control_group('track-select')
    self:handle_control_group('track-state')
+
+   self.parameters = nil
+
+   self.page_left = self:get_widget("back")
+   self.page_right = self:get_widget("forward")
 
    self.knobs = {
       self:get_widget('knob-1'),
@@ -22,6 +28,16 @@ function DisplayActivity:register(pusher)
       self:get_widget('knob-6'),
       self:get_widget('knob-7'),
       self:get_widget('knob-8')
+   }
+   self.touched = {
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
    }
    self.line_a = {
       self:get_widget('display-1-1'),
@@ -47,6 +63,23 @@ function DisplayActivity:register(pusher)
       self:get_widget('display-3-4'),
       self:get_widget('display-4-4')
    }
+
+   self.parameter_name = nil
+   self.parameter_value = nil
+end
+
+function DisplayActivity:on_dial_touch(control)
+   if (control.group == 'knobs') then
+      self.touched[control.x] = true
+      self:update_parameters()
+   end
+end
+
+function DisplayActivity:on_dial_release(control)
+   if (control.group == 'knobs') then
+      self.touched[control.x] = false
+      self:update_parameters()
+   end
 end
 
 function DisplayActivity:adjust_parameter(parameter,change)
@@ -65,30 +98,36 @@ function DisplayActivity:adjust_parameter(parameter,change)
 end
 
 function DisplayActivity:update_parameters()
-   self:display_parameters(
-      self.parameters,
-      self.parameter_name,
-      self.parameter_graph,
-      self.parameter_value
-   )
+   if (self.parameters ~= nil) then
+      self:display_parameters(
+         self.parameters,
+         self.touched,
+         self.parameter_name,
+         self.parameter_value
+      )
+   end
 end
 
-function DisplayActivity:display_parameters(parameters,names,graphs,values)
+function DisplayActivity:display_parameters(parameters,touched,first,second)
    for i in range(0,3) do
-      local a = parameters[i*2+1]
-      local b = parameters[i*2+2]
-      if (names ~= nil) then
-         names[i+1]:set_split(self:display_parameter_name(a),
-                              self:display_parameter_name(b))
+      local pa = parameters[i*2+1]
+      local pb = parameters[i*2+2]
+      local ta = touched[i*2+1]
+      local tb = touched[i*2+2]
+      local first = first[i+1]
+      local second = second[i+1]
+      local firsta = self:display_parameter_name(pa)
+      local firstb = self:display_parameter_name(pb)
+      local seconda = self:display_parameter_value(pa)
+      local secondb = self:display_parameter_value(pb)
+      if ta then
+         firsta = self:display_parameter_graph(pa)
       end
-      if (graphs ~= nil) then
-         graphs[i+1]:set_split(self:display_parameter_graph(a),
-                               self:display_parameter_graph(b))
+      if tb then
+         firstb = self:display_parameter_graph(pb)
       end
-      if (values ~= nil) then
-         values[i+1]:set_split(self:display_parameter_value(a),
-                               self:display_parameter_value(b))
-      end
+      first:set_split(firsta, firstb)
+      second:set_split(seconda, secondb)
    end
 end
 function DisplayActivity:display_parameter_name(parameter)
@@ -108,25 +147,25 @@ end
 function DisplayActivity:display_parameter_graph(parameter)
    local width = 8
    if (parameter ~= nil) then
-      local value = parameter.value + math.abs(parameter.value_min)
-      local range = parameter.value_max + math.abs(parameter.value_min)
-      local step = range / (width + 1)
       if (parameter.polarity == renoise.DeviceParameter.POLARITY_UNIPOLAR) then
+         local value = parameter.value + math.abs(parameter.value_min)
+         local range = parameter.value_max + math.abs(parameter.value_min)
+         local step = range / (width + 1)
          local steps = math.min(width, math.floor(value / step))
          local limlo = ""
          local limhi = ""
          local space = width - steps
-         if (value == parameter.value_min) then
+         if (parameter.value == parameter.value_min) then
             limlo = "0"
             space = space - 1
          end
-         if (value == parameter.value_max) then
+         if (parameter.value == parameter.value_max) then
             limhi = "!"
             steps = steps - 1
          end
          return limlo .. PIPES[steps + 1] .. limhi .. DASHES[space + 1]
-      else
-         return "--------"
+      elseif (parameter.polarity == renoise.DeviceParameter.POLARITY_BIPOLAR) then
+         return ""
       end
    else
       return ""

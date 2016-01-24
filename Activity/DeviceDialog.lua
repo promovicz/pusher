@@ -9,11 +9,6 @@ function DeviceDialog:register(pusher)
    LOG("DeviceDialog: register()")
    DisplayActivity.register(self, pusher)
 
-   self:handle_control('device')
-   self:handle_control_group('display')
-   self:handle_control_group('knobs')
-   self:handle_control_group('track-select')
-
    self.display_name = {
       self:get_widget('display-1-1'),
       self:get_widget('display-2-1'),
