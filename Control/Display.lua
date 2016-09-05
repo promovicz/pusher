@@ -97,7 +97,7 @@ end
 
 function PusherDisplay:do_write()
    self.pusher:send_sysex(
-      SYSEX_START, self.write_op, self.line, SYSEX_END)
+      SYSEX_START, self.write_op, self.line)
 end
 
 

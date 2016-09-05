@@ -82,6 +82,18 @@ function DisplayActivity:on_dial_release(control)
    end
 end
 
+function DisplayActivity:on_dial_change(control, change)
+   if (control.group == 'knobs') then
+      if self.parameters ~= nil then
+         local parameter = self.parameters[control.x]
+         if parameter ~= nil then
+            self:adjust_parameter(parameter, change)
+            self:update_parameters()
+         end
+      end
+   end
+end
+
 function DisplayActivity:adjust_parameter(parameter,change)
    if (parameter ~= nil) then
       local quantum = parameter.value_quantum
@@ -151,7 +163,7 @@ function DisplayActivity:display_parameter_graph(parameter)
          local value = parameter.value + math.abs(parameter.value_min)
          local range = parameter.value_max + math.abs(parameter.value_min)
          local step = range / (width + 1)
-         local steps = math.min(width, math.floor(value / step))
+         local steps = math.max(0, math.min(width, math.floor(value / step)))
          local limlo = ""
          local limhi = ""
          local space = width - steps

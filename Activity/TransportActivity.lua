@@ -10,11 +10,13 @@ function TransportActivity:register(pusher)
    PusherActivity.register(self, pusher)
 
    self:handle_control('master')
-
    self:handle_control('volume')
    self:handle_control('pan-send')
    self:handle_control('track')
    self:handle_control('device')
+
+   self:handle_control('solo')
+   self:handle_control('mute')
 
    self:handle_control('note')
    self:handle_control('session')
@@ -34,50 +36,57 @@ function TransportActivity:register(pusher)
    transport.playing_observable:add_notifier(self, TransportActivity.update)
 end
 
+function TransportActivity:update_mode_button(button, mode)
+   local w = self:get_widget(button)
+   if self.pusher:in_mode(mode) then
+      w:set_color('full')
+   else
+      w:set_color('half')
+   end
+end
+
+function TransportActivity:update_dialog_button(button, dialog)
+   local w = self:get_widget(button)
+   if self.pusher:in_dialog(dialog) then
+      w:set_color('full')
+   else
+      w:set_color('half')
+   end
+end
+
 function TransportActivity:update()
    LOG("TransportActivity: update()")
-   local transport = renoise.song().transport
+   local song = renoise.song()
+   local track = song.selected_track
+   local transport = song.transport
 
-   local c
+   self:update_mode_button('note',    'notes')
+   self:update_mode_button('session', 'pattern')
 
-   c = self:get_widget('note')
-   if (self.pusher:in_mode('notes')) then
-      c:set_color('full')
-   else
-      c:set_color('half')
-   end
-   c = self:get_widget('session')
-   if (self.pusher:in_mode('pattern')) then
-      c:set_color('full')
-   else
-      c:set_color('half')
-   end
+   self:update_dialog_button('master',  'master')
+   self:update_dialog_button('volume',  'volume')
+   self:update_dialog_button('pan-send', 'pansend')
+   self:update_dialog_button('track',   'track')
+   self:update_dialog_button('device',  'device')
 
-   self:get_widget('master'):set_color('full')
-
-   c = self:get_widget('volume')
-   if (self.pusher:in_dialog('volume')) then
-      c:set_color('full')
+   local solo = self:get_widget('solo')
+   local mute = self:get_widget('mute')
+   if track then
+      local muted = (track.mute_state == renoise.Track.MUTE_STATE_OFF
+                        or track.mute_state == renoise.Track.MUTE_STATE_MUTED)
+      if muted then
+         mute:set_color('full')
+      else
+         mute:set_color('half')
+      end
+      if track.solo_state then
+         solo:set_color('full')
+      else
+         solo:set_color('half')
+      end
    else
-      c:set_color('half')
-   end
-   c = self:get_widget('pan-send')
-   if (self.pusher:in_dialog('pan-send')) then
-      c:set_color('full')
-   else
-      c:set_color('half')
-   end
-   c = self:get_widget('track')
-   if (self.pusher:in_dialog('track')) then
-      c:set_color('full')
-   else
-      c:set_color('half')
-   end
-   c = self:get_widget('device')
-   if (self.pusher:in_dialog('device')) then
-      c:set_color('full')
-   else
-      c:set_color('half')
+      mute:set_color('off')
+      solo:set_color('off')
    end
 
    local metronome = self:get_widget('metronome')
@@ -107,17 +116,22 @@ function TransportActivity:on_mode_change(activity)
 end
 
 function TransportActivity:on_button_press(control)
-   local transport = renoise.song().transport
+   local song = renoise.song()
+   local track = song.selected_track
+   local transport = song.transport
 
    local id = control.id
+
    if(id == 'metronome') then
       local enabled = transport.metronome_enabled
       transport.metronome_enabled = not enabled
    end
+
    if(id == 'record') then
       local enabled = transport.edit_mode
       transport.edit_mode = not enabled
    end
+
    if(id == 'play') then
       if transport.playing then
          transport.playing = false
@@ -126,12 +140,22 @@ function TransportActivity:on_button_press(control)
          transport:trigger_sequence(pos)
       end
    end
-   if(id == 'tap-tempo') then
+
+   if(id == 'note') then
+      self.pusher:mode_note()
+   end
+   if(id == 'session') then
+      self.pusher:mode_pattern()
+   end
+
+   if(id == 'master') then
+      self.pusher:show_master_dialog()
    end
    if(id == 'volume') then
       self.pusher:show_volume_dialog()
    end
    if(id == 'pan-send') then
+      self.pusher:show_pansend_dialog()
    end
    if(id == 'track') then
       self.pusher:show_track_dialog()
@@ -139,11 +163,24 @@ function TransportActivity:on_button_press(control)
    if(id == 'device') then
       self.pusher:show_device_dialog()
    end
-   if(id == 'note') then
-      self.pusher:mode_note()
+
+   if(id == 'solo') then
+      if track then
+         track:solo()
+      end
    end
-   if(id == 'session') then
-      self.pusher:mode_pattern()
+
+   if(id == 'mute') then
+      if track then
+         if is_track_muted(track) then
+            track:unmute()
+         else
+            track:mute()
+         end
+      end
+   end
+
+   if(id == 'tap-tempo') then
    end
 
    self:update()
@@ -162,6 +199,7 @@ function TransportActivity:on_dial_change(control, change)
       end
       renoise.song().transport.bpm = new
    end
+
    if(id == 'master-knob') then
       local master = get_master_track()
       local v = master.prefx_volume

@@ -25,9 +25,6 @@ function NotesActivity:register(pusher)
 
    self:handle_control('ribbon')
 
-   self:handle_control('solo')
-   self:handle_control('mute')
-
    self:handle_control('scales')
    self:handle_control('stop')
    self:handle_control('octave-up')
@@ -40,10 +37,6 @@ function NotesActivity:update()
    LOG("NotesActivity: update()")
 
    local c
-   c = self.widgets['solo']
-   c:set_color('half')
-   c = self.widgets['mute']
-   c:set_color('half')
    c = self.widgets['stop']
    c:set_color('full')
 

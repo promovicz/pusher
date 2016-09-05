@@ -50,6 +50,7 @@ function PusherActivity:get_pad_bottom(x, y)
    end
 end
 
+-- register activity as handler for all controls
 function PusherActivity:handle_all_controls()
    self:log("handles all controls")
    self.controls = self.pusher.controls
@@ -59,6 +60,7 @@ function PusherActivity:handle_all_controls()
    end
 end
 
+-- register activity as handler for given control
 function PusherActivity:handle_control(id)
    local control = self.pusher:get_control(id)
    self:log("handles control", control.id)
@@ -68,6 +70,7 @@ function PusherActivity:handle_control(id)
    return widget
 end
 
+-- register activity as handler for given control group
 function PusherActivity:handle_control_group(group_id)
    self:log("handles group", group_id)
    local controls = self.pusher:get_control_group(group_id)

@@ -6,8 +6,20 @@ class 'PusherRibbon' (PusherControl)
 
 function PusherRibbon:__init(id, note)
    PusherControl.__init(self, 'ribbon', id)
-   self.touched = false
    self.note = note
+   self.touched = false
+   self.bend = 0
+   self.mode = 'pitchbend'
+   self.leds = {
+      false,false,false,false,
+      false,false,false,false,
+      false,false,false,false,
+      false,false,false,false,
+      false,false,false,false,
+      false,false,false,false,
+   }
+   self.last_mode = nil
+   self.last_leds = nil
 end
 
 function PusherRibbon:register(pusher)
@@ -22,9 +34,31 @@ function PusherRibbon:invalidate()
 end
 
 function PusherRibbon:update()
-   if (self.invalid) then
-      self.invalid = false
+   local send_leds = false
+   if (self.invalid or self.mode ~= self.last_mode) then
+      local mode = self.mode
+      local mobj = RIBBON_MODES[self.mode]
+      if mode == 'custom-free' then
+         send_leds = true
+      end
+      self.pusher:send_sysex(
+         SYSEX_START, RIBBON_SET_MODE, {mobj.value}
+      )
+      self.last_mode = mode
    end
+   if send_leds then
+      if (self.invalid or self.leds ~= self.last_leds) then
+         local leds = self.leds
+         local bytes = {1, 2, 3}
+         self.pusher:send_sysex(
+            SYSEX_START, RIBBON_SET_LEDS, bytes
+         )
+         self.last_leds = leds
+      end
+   else
+      self.last_leds = nil
+   end
+   self.invalid = false
 end
 
 function PusherRibbon:on_note_on(note, value)
@@ -37,6 +71,7 @@ end
 
 function PusherRibbon:on_bend(value)
    self:log_i("ribbon", self.id, "bend", value)
+   self.bend = value
    local handler = self:get_handler()
    if (handler ~= nil and self.widget ~= nil) then
       handler:on_ribbon_bend(self.widget, value)

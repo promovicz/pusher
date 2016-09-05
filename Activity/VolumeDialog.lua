@@ -1,26 +1,23 @@
 
-class 'VolumeDialog' (DisplayActivity)
+class 'VolumeDialog' (MixingDialog)
 
 function VolumeDialog:__init()
-   DisplayActivity.__init(self, 'volume')
+   MixingDialog.__init(self, 'volume')
 end
 
 function VolumeDialog:register(pusher)
    LOG("VolumeDialog: register()")
-   DisplayActivity.register(self, pusher)
+   MixingDialog.register(self, pusher)
+
+   self:handle_control('volume')
 
    self.track_name      = self.line_a
-   self.track_status    = self.line_d
+   self.track_state     = self.line_d
 
    self.parameter_name  = self.line_b
    self.parameter_value = self.line_c
 
-   self:handle_control('volume')
-
    self:mode_reset()
-
-   local song = renoise.song()
-   song.tracks_observable:add_notifier(self, VolumeDialog.ob_tracks_changed)
 end
 
 function VolumeDialog:mode_reset()
@@ -39,25 +36,16 @@ function VolumeDialog:mode_next()
    self:update()
 end
 
-function VolumeDialog:ob_tracks_changed()
-   self:update()
-end
-
 function VolumeDialog:on_dialog_show()
+   MixingDialog.on_dialog_show(self)
    self:mode_reset()
 end
 
 function VolumeDialog:on_button_press(control)
+   MixingDialog.on_button_press(self, control)
    local id = control.id
    if (id == 'volume') then
       self:mode_next()
-   end
-end
-function VolumeDialog:on_dial_change(control, change)
-   if (control.group == 'knobs') then
-      local parameter = self.parameters[control.x]
-      self:adjust_parameter(parameter, change)
-      self:update_parameters()
    end
 end
 
@@ -69,10 +57,6 @@ function VolumeDialog:update()
 
    self:get_widget('volume'):set_color('full')
 
-   for i, d in pairs(self.line_c) do
-      d:set_text("")
-   end
-
    local parameters = { }
    local names = { }
    for i, t in pairs(tracks) do
@@ -83,10 +67,9 @@ function VolumeDialog:update()
          parameters[i] = t.prefx_volume
       end
    end
-   self.track_name[1]:set_split(names[1], names[2])
-   self.track_name[2]:set_split(names[3], names[4])
-   self.track_name[3]:set_split(names[5], names[6])
-   self.track_name[4]:set_split(names[7], names[8])
+
    self.parameters = parameters
    self:update_parameters()
+   self:update_track_display()
+   self:update_track_buttons()
 end

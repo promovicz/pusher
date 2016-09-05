@@ -7,14 +7,6 @@ function LOG(...)
    print(...)
 end
 
-function log_control_in(...)
-   print (...)
-end
-function log_control_out(...)
-   print (...)
-end
-
-
 function range(a, b, step)
   if not b then
     b = a
@@ -95,4 +87,9 @@ function send_track(send_index)
   else
     return nil
   end
+end
+
+function is_track_muted(track)
+   return track.mute_state == renoise.Track.MUTE_STATE_OFF
+      or track.mute_state == renoise.Track.MUTE_STATE_MUTED
 end

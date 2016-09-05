@@ -67,6 +67,9 @@ function Pusher:in_dialog(id)
    return self.dialog_activity ~= nil
       and self.dialog_activity.id == id
 end
+function Pusher:show_master_dialog()
+   self:show_dialog(self.d_master)
+end
 function Pusher:show_volume_dialog()
    self:show_dialog(self.d_volume)
 end
@@ -75,6 +78,9 @@ function Pusher:show_track_dialog()
 end
 function Pusher:show_device_dialog()
    self:show_dialog(self.d_device)
+end
+function Pusher:show_pansend_dialog()
+   self:show_dialog(self.d_pansend)
 end
 function Pusher:show_scale_dialog()
    self:show_dialog(self.d_scale)
@@ -247,10 +253,12 @@ function Pusher:initialize_activities()
    self.a_notes = self:initialize_activity(NotesActivity)
    self.a_pattern = self:initialize_activity(PatternActivity)
 
+   self.d_master = self:initialize_activity(MasterDialog)
    self.d_device = self:initialize_activity(DeviceDialog)
    self.d_scale = self:initialize_activity(ScaleDialog)
    self.d_track = self:initialize_activity(TrackDialog)
    self.d_volume = self:initialize_activity(VolumeDialog)
+   self.d_pansend = self:initialize_activity(PanSendDialog)
 
    self.mode_activity = self.a_notes
 end

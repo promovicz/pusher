@@ -20,9 +20,11 @@ function PatternActivity:register(pusher)
    -- cursor for sequencer scrolling
    self:handle_control_group('cursor')
 
-   local song = renoise.song()
+   self.timer_registered = false
 
+   local song = renoise.song()
    local sequencer = song.sequencer
+
    sequencer.pattern_assignments_observable:add_notifier(self, PatternActivity.update)
    sequencer.pattern_sequence_observable:add_notifier(self, PatternActivity.update)
    sequencer.selection_range_observable:add_notifier(self, PatternActivity.update)
@@ -32,7 +34,6 @@ function PatternActivity:register(pusher)
 
    song.transport.playing_observable:add_notifier(self, PatternActivity.update_timer)
 
-   self.timer_registered = false
    self:update_timer()
 end
 
@@ -100,6 +101,7 @@ function PatternActivity:update()
 
    local patseq = sequencer.pattern_sequence
 
+   -- update the pads
    for pady in range(1,8) do
       for padx in range(1,8) do
          local pad = self:get_pad_top(padx, pady)
@@ -111,16 +113,20 @@ function PatternActivity:update()
          if (y > #patseq or x > #tracks) then
             pad:set_color('off')
          elseif (x == seltrack and y == editpos.sequence) then
-            pad:set_color('red')
-         elseif (y == playpos.sequence) then
-            if (track.is_empty) then
-               pad:set_color('lime')
+            if transport.edit_mode then
+               pad:set_color('red')
             else
                pad:set_color('green')
             end
-         else
+         elseif (y == playpos.sequence) then
             if (track.is_empty) then
                pad:set_color('darkgrey')
+            else
+               pad:set_color('spring')
+            end
+         else
+            if (track.is_empty) then
+               pad:set_color('off')
             else
                pad:set_color('white')
             end
@@ -128,6 +134,7 @@ function PatternActivity:update()
       end
    end
 
+   -- update cursor buttons
    local c
    c = self.widgets['cursor-up']
    if (self.yoff > 0) then

@@ -40,13 +40,6 @@ function TrackDialog:on_button_press(control)
       renoise.song().selected_track_index = control.x
    end
 end
-function TrackDialog:on_dial_change(control, change)
-   if (control.group == 'knobs') then
-      local parameter = self.parameters[control.x]
-      self:adjust_parameter(parameter, change)
-      self:update_parameters()
-   end
-end
 
 function TrackDialog:on_tracks_changed()
    self:update()
